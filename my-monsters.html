@@ -101,7 +101,8 @@
         }
         .monster-card h4 { color: #e8b84b; margin: 0 0 10px 0; font-size: 1.2em; border-bottom: 1px solid #444; padding-bottom: 5px; padding-right: 30px; }
         .monster-card p { margin: 5px 0; }
-        .monster-card .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0; }
+        
+        /* Кнопка удаления монстра */
         .monster-card .delete-btn {
             position: absolute;
             top: 10px;
@@ -113,7 +114,7 @@
             padding: 5px 10px;
             cursor: pointer;
             font-size: 0.8em;
-            z-index: 10; /* Чтобы кнопка была поверх всего */
+            z-index: 999; /* Гарантированно поверх всего */
         }
         .monster-card .delete-btn:hover { background-color: #d64545; }
     </style>
@@ -132,50 +133,50 @@
     </div>
 
     <script>
-        // ==== ОСНОВНАЯ ЛОГИКА ====
+        // ==== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====
         
+        // Эта функция вызывается напрямую из HTML-кода кнопки удаления
+        function deleteMonster(folderName, monsterId) {
+            if (confirm('Вы уверены, что хотите удалить этого монстра?')) {
+                let db = JSON.parse(localStorage.getItem('dnd_monsters_db')) || { folders: [] };
+                
+                // Находим папку по имени
+                let folder = db.folders.find(f => f.name === folderName);
+                
+                if (folder && folder.monsters) {
+                    // Оставляем только тех, чей ID не совпадает
+                    folder.monsters = folder.monsters.filter(m => m.id !== monsterId);
+                    
+                    // Сохраняем
+                    localStorage.setItem('dnd_monsters_db', JSON.stringify(db));
+                    
+                    // Перерисовываем страницу
+                    render();
+                }
+            }
+        }
+
+        function deleteFolder(folderName) {
+            if (confirm(`Удалить папку "${folderName}" и всех монстров в ней?`)) {
+                let db = JSON.parse(localStorage.getItem('dnd_monsters_db')) || { folders: [] };
+                db.folders = db.folders.filter(f => f.name !== folderName);
+                localStorage.setItem('dnd_monsters_db', JSON.stringify(db));
+                render();
+            }
+        }
+
+        // ==== ЛОГИКА ОТРИСОВКИ ====
+
         const foldersContainer = document.getElementById('folders-container');
         const newFolderInput = document.getElementById('new-folder-name');
         const createFolderBtn = document.getElementById('create-folder-btn');
 
-        // Безопасное получение базы
-        function getDB() {
-            try {
-                const data = localStorage.getItem('dnd_monsters_db');
-                if (!data) return { folders: [] };
-                const parsed = JSON.parse(data);
-                // Защита: если папок нет, создаем пустой массив
-                if (!parsed.folders) parsed.folders = [];
-                return parsed;
-            } catch (e) {
-                console.error("Ошибка чтения базы:", e);
-                return { folders: [] };
-            }
-        }
-
-        function saveDB(db) {
-            try {
-                localStorage.setItem('dnd_monsters_db', JSON.stringify(db));
-            } catch (e) {
-                console.error("Ошибка сохранения базы:", e);
-                alert("Не удалось сохранить данные. Возможно, переполнена память браузера.");
-            }
-        }
-
-        function getModifier(val) {
-            if (!val) return null;
-            const num = parseInt(val, 10);
-            if (isNaN(num)) return null;
-            return Math.floor((num - 10) / 2);
-        }
-
-        // Безопасное превращение массива в строку
-        function safeJoin(arr) {
-            return Array.isArray(arr) ? arr.join(', ') : '';
-        }
-
         function render() {
-            const db = getDB();
+            let db = { folders: [] };
+            try {
+                db = JSON.parse(localStorage.getItem('dnd_monsters_db')) || { folders: [] };
+            } catch(e) { console.error(e); }
+
             foldersContainer.innerHTML = ''; 
 
             if (db.folders.length === 0) {
@@ -186,36 +187,27 @@
             db.folders.forEach((folder) => {
                 const folderDiv = document.createElement('div');
                 folderDiv.className = 'folder';
+                
+                const folderName = folder.name || 'Без названия';
+                const monsters = folder.monsters || [];
 
+                // Заголовок папки
                 const header = document.createElement('div');
                 header.className = 'folder-header';
-                // Защита от пустого имени папки
-                const folderName = folder.name || "Без названия";
-                header.innerHTML = `<h3>📁 ${folderName} <span style="font-size:0.8em; color:#888;">(${folder.monsters ? folder.monsters.length : 0} шт.)</span></h3>`;
+                header.innerHTML = `<h3>📁 ${folderName} <span style="font-size:0.8em; color:#888;">(${monsters.length} шт.)</span></h3>`;
                 
+                // Кнопка удаления папки (через onclick в HTML)
                 const delFolderBtn = document.createElement('button');
                 delFolderBtn.className = 'btn btn-danger';
                 delFolderBtn.textContent = 'Удалить папку';
-                delFolderBtn.onclick = (e) => {
-                    e.stopPropagation(); 
-                    if (confirm(`Вы уверены, что хотите удалить папку "${folderName}" и всех монстров в ней?`)) {
-                        let currentDb = getDB();
-                        // Удаляем папку по имени (так надежнее, чем по индексу)
-                        currentDb.folders = currentDb.folders.filter(f => f.name !== folder.name);
-                        saveDB(currentDb);
-                        render();
-                    }
-                };
+                delFolderBtn.setAttribute('onclick', `event.stopPropagation(); deleteFolder('${folderName.replace(/'/g, "\\'")}')`);
                 header.appendChild(delFolderBtn);
 
+                // Контент папки
                 const content = document.createElement('div');
                 content.className = 'folder-content';
                 
-                header.onclick = () => {
-                    content.classList.toggle('open');
-                };
-
-                const monsters = folder.monsters || [];
+                header.onclick = () => { content.classList.toggle('open'); };
 
                 if (monsters.length > 0) {
                     const grid = document.createElement('div');
@@ -224,65 +216,27 @@
                     monsters.forEach((monster) => {
                         const card = document.createElement('div');
                         card.className = 'monster-card';
+                        
+                        const monsterName = monster.name || 'Без имени';
+                        const monsterId = monster.id || '';
 
+                        // Кнопка удаления монстра (через onclick в HTML)
                         const delMonsterBtn = document.createElement('button');
                         delMonsterBtn.className = 'delete-btn';
                         delMonsterBtn.textContent = '✖';
                         delMonsterBtn.title = 'Удалить монстра';
+                        // Вот тут магия: передаем имя папки и ID монстра прямо в функцию
+                        delMonsterBtn.setAttribute('onclick', `deleteMonster('${folderName.replace(/'/g, "\\'")}', '${monsterId}')`);
                         
-                        delMonsterBtn.onclick = (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            if (confirm(`Точно удалить монстра "${monster.name || 'Без имени'}" из этой папки?`)) {
-                                let currentDb = getDB();
-                                let currentFolder = currentDb.folders.find(f => f.name === folder.name);
-                                
-                                if (currentFolder && currentFolder.monsters) {
-                                    // Фильтруем по ID, а если ID нет — по имени и индексу
-                                    currentFolder.monsters = currentFolder.monsters.filter(m => {
-                                        if (m.id && monster.id) return m.id !== monster.id;
-                                        return m !== monster; // Резервный вариант
-                                    });
-                                    saveDB(currentDb);
-                                    render();
-                                }
-                            }
-                        };
                         card.appendChild(delMonsterBtn);
 
-                        // Защита данных при выводе
-                        const name = monster.name || 'Без имени';
-                        const type = monster.type || '—';
-                        const size = monster.size || '—';
-                        const role = monster.role || '—';
-                        const ac = monster.ac || '—';
-                        const speed = monster.speed || '—';
+                        // Вывод данных
                         const hp = (monster.hpMin && monster.hpMax) ? `${monster.hpMin}-${monster.hpMax}` : (monster.hpMin || monster.hpMax || '—');
                         
-                        const stats = monster.stats || {};
-                        const statsHtml = ['str', 'dex', 'con', 'int', 'wis', 'cha'].map(stat => {
-                            const val = stats[stat];
-                            if (!val) return `<span>—</span>`;
-                            const mod = getModifier(val);
-                            const modStr = mod !== null ? (mod >= 0 ? `+${mod}` : `${mod}`) : '';
-                            return `<span><b>${stat.toUpperCase()}:</b> ${val} ${modStr ? `(${modStr})` : ''}</span>`;
-                        }).join('<br>');
-
                         card.innerHTML += `
-                            <h4>${name}</h4>
-                            <p><b>Тип:</b> ${type} | <b>Размер:</b> ${size} | <b>Роль:</b> ${role}</p>
-                            <p><b>КД:</b> ${ac} | <b>ХП:</b> ${hp} | <b>Скорость:</b> ${speed}</p>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 10px 0; font-size: 0.9em;">
-                                ${statsHtml}
-                            </div>
-                            ${monster.saves && monster.saves.length ? `<p><b>Спасброски:</b> ${safeJoin(monster.saves)}</p>` : ''}
-                            ${monster.vulns && monster.vulns.length ? `<p><b>Уязвимости:</b> ${safeJoin(monster.vulns)}</p>` : ''}
-                            ${monster.ress && monster.ress.length ? `<p><b>Сопротивления:</b> ${safeJoin(monster.ress)}</p>` : ''}
-                            ${monster.imms && monster.imms.length ? `<p><b>Иммунитет:</b> ${safeJoin(monster.imms)}</p>` : ''}
-                            ${monster.traits ? `<p><b>Особенности:</b><br><span style="white-space: pre-wrap;">${monster.traits}</span></p>` : ''}
-                            ${monster.actions ? `<p><b>Действия:</b><br><span style="white-space: pre-wrap;">${monster.actions}</span></p>` : ''}
-                            ${monster.description ? `<p><b>Описание:</b><br><span style="white-space: pre-wrap;">${monster.description}</span></p>` : ''}
+                            <h4>${monsterName}</h4>
+                            <p><b>Тип:</b> ${monster.type || '—'} | <b>Размер:</b> ${monster.size || '—'} | <b>Роль:</b> ${monster.role || '—'}</p>
+                            <p><b>КД:</b> ${monster.ac || '—'} | <b>ХП:</b> ${hp} | <b>Скорость:</b> ${monster.speed || '—'}</p>
                         `;
 
                         grid.appendChild(card);
@@ -300,17 +254,15 @@
 
         createFolderBtn.onclick = () => {
             const name = newFolderInput.value.trim();
-            if (!name) {
-                alert("Введите название папки!");
-                return;
-            }
-            const db = getDB();
+            if (!name) { alert("Введите название папки!"); return; }
+            
+            let db = JSON.parse(localStorage.getItem('dnd_monsters_db')) || { folders: [] };
             if (db.folders.find(f => f.name.toLowerCase() === name.toLowerCase())) {
-                alert("Папка с таким названием уже существует!");
-                return;
+                alert("Папка с таким названием уже существует!"); return;
             }
             db.folders.push({ name: name, monsters: [] });
-            saveDB(db);
+            localStorage.setItem('dnd_monsters_db', JSON.stringify(db));
+            
             newFolderInput.value = '';
             render();
         };
