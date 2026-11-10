@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Наша D&D кампания</title>
+    <title>Инструменты мастера — D&D</title>
     <style>
         body {
             font-family: Georgia, serif;
@@ -19,38 +19,42 @@
             border-bottom: 2px solid #c9a227;
             padding-bottom: 10px;
         }
-        h2 {
-            color: #c9a227;
-        }
         a {
             color: #e8b84b;
         }
         .card {
+            display: block;
             background-color: #2a2a2a;
             border-left: 4px solid #c9a227;
             padding: 15px 20px;
             margin: 20px 0;
             border-radius: 4px;
+            text-decoration: none;
+            color: #e8e0d0;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .card:hover {
+            background-color: #333333;
+            transform: translateX(4px);
+        }
+        .card h2 {
+            color: #c9a227;
+            margin-top: 0;
+        }
+        .card p {
+            margin-bottom: 0;
         }
     </style>
 </head>
 <body>
-    <h1>⚔️ Наша D&D кампания</h1>
-    <p>Добро пожаловать на сайт нашего приключения!</p>
+    <h1>⚔️ Инструменты мастера</h1>
+    <p>Набор генераторов и помощников для нашей D&D кампании.</p>
 
-    <div class="card">
-        <h2>О кампании</h2>
-        <p>Здесь будет описание мира, лор и основные события.</p>
-    </div>
+    <!-- Карточка-ссылка. Чтобы добавить новый блок — скопируй этот <a> и поменяй заголовок, описание и href -->
+    <a class="card" href="monster.html">
+        <h2>Создатель монстров</h2>
+        <p>Небольшой генератор упрощённого статблока монстра по собирательным таблицам.</p>
+    </a>
 
-    <div class="card">
-        <h2>Персонажи</h2>
-        <p>Ссылки на листы персонажей и их истории появятся здесь.</p>
-    </div>
-
-    <div class="card">
-        <h2>Правила и заметки</h2>
-        <p>Домашние правила, полезные ссылки и записи сессий.</p>
-    </div>
 </body>
 </html>
