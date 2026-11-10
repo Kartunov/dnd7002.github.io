@@ -92,6 +92,12 @@
             color: #c9a227;
             font-weight: normal;
         }
+        
+        /* ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ ДЛЯ ТЕКСТА */
+        td {
+            white-space: pre-wrap; 
+        }
+
         td.centered { text-align: center; }
         td.stats-header { text-align: center; font-weight: bold; }
         
@@ -297,12 +303,12 @@
                 <td class="stats-header">ХАР</td>
             </tr>
             <tr>
-                <td class="centered" id="out-str" class="empty">—</td>
-                <td class="centered" id="out-dex" class="empty">—</td>
-                <td class="centered" id="out-con" class="empty">—</td>
-                <td class="centered" id="out-int" class="empty">—</td>
-                <td class="centered" id="out-wis" class="empty">—</td>
-                <td class="centered" id="out-cha" class="empty">—</td>
+                <td class="centered empty" id="out-str">—</td>
+                <td class="centered empty" id="out-dex">—</td>
+                <td class="centered empty" id="out-con">—</td>
+                <td class="centered empty" id="out-int">—</td>
+                <td class="centered empty" id="out-wis">—</td>
+                <td class="centered empty" id="out-cha">—</td>
             </tr>
             <tr>
                 <td colspan="6">Спасброски: <span id="out-saves" class="empty">—</span></td>
@@ -345,10 +351,11 @@
         function updateOut(id, value, defaultText = "—") {
             const el = document.getElementById(id);
             if (value && value.trim() !== "") {
-                el.textContent = value;
+                // Заменяем textContent на innerHTML, чтобы переносы строк работали вместе с white-space: pre-wrap
+                el.innerHTML = value; 
                 el.classList.remove('empty');
             } else {
-                el.textContent = defaultText;
+                el.innerHTML = defaultText;
                 el.classList.add('empty');
             }
         }
@@ -382,12 +389,12 @@
                 const outEl = document.getElementById('out-' + statName);
                 
                 if (val === "") {
-                    outEl.textContent = "—";
+                    outEl.innerHTML = "—";
                     outEl.classList.add('empty');
                 } else {
                     const mod = getModifier(val);
                     const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
-                    outEl.textContent = `${val} / ${modStr}`;
+                    outEl.innerHTML = `${val} / ${modStr}`;
                     outEl.classList.remove('empty');
                 }
             });
