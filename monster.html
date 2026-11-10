@@ -430,5 +430,74 @@
         // Первичный вызов (на случай если поля уже заполнены)
         updateTable();
     </script>
+
+        <div class="table-container">
+        <h2>Результат (Статблок)</h2>
+        
+        <!-- НОВАЯ КНОПКА ДЛЯ СКАЧИВАНИЯ -->
+        <button class="btn" id="download-word-btn" style="margin-bottom: 20px;">Скачать в Word (.doc)</button>
+
+        <table>
+
+            <script>
+                        // ==========================================
+        // ЭКСПОРТ В WORD
+        // ==========================================
+        
+        document.getElementById('download-word-btn').addEventListener('click', function() {
+            // 1. Находим нашу таблицу
+            const table = document.querySelector('.table-container table');
+            
+            // 2. Делаем копию таблицы, чтобы случайно не изменить оригинал на странице
+            const tableClone = table.cloneNode(true);
+            
+            // 3. Собираем HTML-структуру документа Word
+            const htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                      xmlns:w='urn:schemas-microsoft-com:office:word' 
+                      xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset="utf-8">
+                    <title>Статблок</title>
+                    <style>
+                        /* Стили для Word, чтобы таблица выглядела аккуратно */
+                        body { font-family: 'Times New Roman', serif; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { 
+                            border: 1px solid #000000; 
+                            padding: 5px; 
+                            text-align: left; 
+                            vertical-align: top;
+                            font-size: 14px;
+                        }
+                        .empty { color: #888888; font-style: italic; }
+                    </style>
+                </head>
+                <body>
+                    ${tableClone.outerHTML}
+                </body>
+                </html>
+            `;
+
+            // 4. Создаем файл (Blob) с правильным MIME-типом для Word
+            const blob = new Blob(['\ufeff', htmlContent], {
+                type: 'application/msword'
+            });
+
+            // 5. Получаем имя монстра из формы для названия файла
+            const monsterName = document.getElementById('name').value.trim() || 'Новый_монстр';
+            
+            // 6. Создаем временную ссылку для скачивания
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            // Имя файла будет вида "Гигантский_костеглот.doc"
+            downloadLink.download = `${monsterName.replace(/\s+/g, '_')}.doc`;
+            
+            // 7. Симулируем клик и удаляем ссылку
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        });
+            </script>
 </body>
 </html>
