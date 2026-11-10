@@ -3,41 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создатель монстров — в разработке</title>
+    <title>Создатель монстров</title>
     <style>
         body {
             font-family: Georgia, serif;
             background-color: #1a1a1a;
             color: #e8e0d0;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
         }
-        h1 {
-            color: #c9a227;
-            border-bottom: 2px solid #c9a227;
-            padding-bottom: 10px;
-        }
-        a {
-            color: #e8b84b;
-        }
-        .placeholder {
+        h1, h2 { color: #c9a227; border-bottom: 2px solid #c9a227; padding-bottom: 10px; }
+        a { color: #e8b84b; }
+        
+        /* Стили для формы */
+        .form-section {
             background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
             border-left: 4px solid #c9a227;
-            padding: 15px 20px;
-            margin: 20px 0;
-            border-radius: 4px;
-            color: #a89f8c;
         }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 0.9em;
+            color: #c9a227;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"], select, textarea {
+            background-color: #1a1a1a;
+            color: #e8e0d0;
+            border: 1px solid #444;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+        .stats-grid .form-group { min-width: 0; }
+        
+        /* Стили для таблицы */
+        .table-container {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1a1a1a;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #333;
+            color: #c9a227;
+            font-weight: normal;
+        }
+        td.centered { text-align: center; }
+        td.stats-header { text-align: center; font-weight: bold; }
+        
+        /* Подсветка пустых значений */
+        .empty { color: #666; font-style: italic; }
     </style>
 </head>
 <body>
     <h1>🐉 Создатель монстров</h1>
     <p><a href="index.html">← Назад на главную</a></p>
 
-    <div class="placeholder">
-        <p>Страница в разработке. Здесь скоро появится генератор упрощённого статблока монстра.</p>
+    <div class="form-section">
+        <h2>1. Основная информация</h2>
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label>Имя / Название</label>
+                <input type="text" id="name" placeholder="Например: Гигантский костеглот">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Тип</label>
+                <select id="type">
+                    <option value="">— Выберите —</option>
+                    <option>Аберрации</option><option>Звери</option><option>Небожители</option>
+                    <option>Конструкты</option><option>Драконы</option><option>Элементали</option>
+                    <option>Феи</option><option>Исчадия</option><option>Великаны</option>
+                    <option>Гуманоиды</option><option>Слизи</option><option>Растения</option>
+                    <option>Нежить</option><option>Монстры</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Размер</label>
+                <select id="size">
+                    <option value="">— Выберите —</option>
+                    <option>Маленький</option><option>Средний</option><option>Большой</option>
+                    <option>Огромный</option><option>Колоссальный</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Роль</label>
+                <select id="role">
+                    <option value="">— Выберите —</option>
+                    <option>Брут</option><option>Арта</option><option>Кастер</option>
+                    <option>Баффер</option><option>Амбашер</option><option>Миньон</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>КД (Класс Доспеха)</label>
+                <input type="number" id="ac" placeholder="Например: 13">
+            </div>
+            <div class="form-group">
+                <label>ХП (Минимум)</label>
+                <input type="number" id="hp-min" placeholder="40">
+            </div>
+            <div class="form-group">
+                <label>ХП (Максимум)</label>
+                <input type="number" id="hp-max" placeholder="60">
+            </div>
+            <div class="form-group">
+                <label>Скорость</label>
+                <input type="number" id="speed" placeholder="Например: 15">
+            </div>
+        </div>
     </div>
+
+    <div class="form-section">
+        <h2>2. Характеристики</h2>
+        <div class="stats-grid">
+            <div class="form-group"><label>СИЛ</label><input type="number" class="stat-input" data-stat="str" placeholder="10"></div>
+            <div class="form-group"><label>ЛОВК</label><input type="number" class="stat-input" data-stat="dex" placeholder="10"></div>
+            <div class="form-group"><label>ТЕЛ</label><input type="number" class="stat-input" data-stat="con" placeholder="10"></div>
+            <div class="form-group"><label>ИНТ</label><input type="number" class="stat-input" data-stat="int" placeholder="10"></div>
+            <div class="form-group"><label>МДР</label><input type="number" class="stat-input" data-stat="wis" placeholder="10"></div>
+            <div class="form-group"><label>ХАР</label><input type="number" class="stat-input" data-stat="cha" placeholder="10"></div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>3. Защиты и спасброски</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Спасбросок 1</label>
+                <select class="save-select"><option value="">—</option><option>СИЛ</option><option>ЛОВК</option><option>ТЕЛ</option><option>ИНТ</option><option>МДР</option><option>ХАР</option></select>
+            </div>
+            <div class="form-group">
+                <label>Спасбросок 2</label>
+                <select class="save-select"><option value="">—</option><option>СИЛ</option><option>ЛОВК</option><option>ТЕЛ</option><option>ИНТ</option><option>МДР</option><option>ХАР</option></select>
+            </div>
+            <div class="form-group">
+                <label>Спасбросок 3</label>
+                <select class="save-select"><option value="">—</option><option>СИЛ</option><option>ЛОВК</option><option>ТЕЛ</option><option>ИНТ</option><option>МДР</option><option>ХАР</option></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Уязвимость 1</label>
+                <select class="vuln-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+            <div class="form-group">
+                <label>Уязвимость 2</label>
+                <select class="vuln-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+            <div class="form-group">
+                <label>Уязвимость 3</label>
+                <select class="vuln-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Сопротивление 1</label>
+                <select class="res-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+            <div class="form-group">
+                <label>Сопротивление 2</label>
+                <select class="res-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+            <div class="form-group">
+                <label>Сопротивление 3</label>
+                <select class="res-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Иммунитет 1</label>
+                <select class="imm-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+            <div class="form-group">
+                <label>Иммунитет 2</label>
+                <select class="imm-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+            <div class="form-group">
+                <label>Иммунитет 3</label>
+                <select class="imm-select"><option value="">—</option><option>Физический</option><option>Дробящий</option><option>Колющий</option><option>Рубящий</option><option>Свет</option><option>Некротический</option><option>Огонь</option><option>Холод</option><option>Молния</option><option>Яд</option><option>Кислота</option><option>Силовой</option><option>Психический</option></select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>4. Текстовые блоки</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Особенности</label>
+                <textarea id="traits" placeholder="Опишите особенности..."></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Действия</label>
+                <textarea id="actions" placeholder="Опишите действия..."></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Бонусные действия</label>
+                <textarea id="bonus-actions" placeholder="Опишите бонусные действия..."></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Реакции</label>
+                <textarea id="reactions" placeholder="Опишите реакции..."></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Легендарные действия</label>
+                <textarea id="legendary-actions" placeholder="Опишите легендарные действия..."></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea id="description" placeholder="Опишите внешний вид и лор..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h2>Результат (Статблок)</h2>
+        <table>
+            <tr>
+                <td colspan="6" id="out-name" class="empty">Имя не указано</td>
+            </tr>
+            <tr>
+                <td colspan="2">Тип: <span id="out-type" class="empty">—</span></td>
+                <td colspan="2">Размер: <span id="out-size" class="empty">—</span></td>
+                <td colspan="2">Роль: <span id="out-role" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="2">КД: <span id="out-ac" class="empty">—</span></td>
+                <td colspan="2">ХП: <span id="out-hp" class="empty">—</span></td>
+                <td colspan="2">Скорость: <span id="out-speed" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td class="stats-header">СИЛ</td>
+                <td class="stats-header">ЛОВК</td>
+                <td class="stats-header">ТЕЛ</td>
+                <td class="stats-header">ИНТ</td>
+                <td class="stats-header">МДР</td>
+                <td class="stats-header">ХАР</td>
+            </tr>
+            <tr>
+                <td class="centered" id="out-str" class="empty">—</td>
+                <td class="centered" id="out-dex" class="empty">—</td>
+                <td class="centered" id="out-con" class="empty">—</td>
+                <td class="centered" id="out-int" class="empty">—</td>
+                <td class="centered" id="out-wis" class="empty">—</td>
+                <td class="centered" id="out-cha" class="empty">—</td>
+            </tr>
+            <tr>
+                <td colspan="6">Спасброски: <span id="out-saves" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="2">Уязвимости: <span id="out-vuln" class="empty">—</span></td>
+                <td colspan="2">Сопротивления: <span id="out-res" class="empty">—</span></td>
+                <td colspan="2">Иммунитет: <span id="out-imm" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Особенности:<br><span id="out-traits" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Действия:<br><span id="out-actions" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Бонусные действия:<br><span id="out-bonus-actions" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Реакции:<br><span id="out-reactions" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Легендарные действия:<br><span id="out-legendary-actions" class="empty">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Описание:<br><span id="out-description" class="empty">—</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        // Функция для расчета модификатора
+        function getModifier(val) {
+            if (val === "" || val === null) return null;
+            const num = parseInt(val, 10);
+            return Math.floor((num - 10) / 2);
+        }
+
+        // Вспомогательная функция для обновления текста в таблице
+        function updateOut(id, value, defaultText = "—") {
+            const el = document.getElementById(id);
+            if (value && value.trim() !== "") {
+                el.textContent = value;
+                el.classList.remove('empty');
+            } else {
+                el.textContent = defaultText;
+                el.classList.add('empty');
+            }
+        }
+
+        // Основная функция обновления таблицы
+        function updateTable() {
+            // 1. Основное
+            const name = document.getElementById('name').value;
+            updateOut('out-name', name, "Имя не указано");
+            
+            updateOut('out-type', document.getElementById('type').value);
+            updateOut('out-size', document.getElementById('size').value);
+            updateOut('out-role', document.getElementById('role').value);
+            
+            updateOut('out-ac', document.getElementById('ac').value);
+            
+            const hpMin = document.getElementById('hp-min').value;
+            const hpMax = document.getElementById('hp-max').value;
+            let hpStr = "";
+            if (hpMin && hpMax) hpStr = hpMin + "-" + hpMax;
+            else if (hpMin) hpStr = hpMin;
+            else if (hpMax) hpStr = hpMax;
+            updateOut('out-hp', hpStr);
+            
+            updateOut('out-speed', document.getElementById('speed').value);
+
+            // 2. Статы и модификаторы
+            document.querySelectorAll('.stat-input').forEach(input => {
+                const statName = input.getAttribute('data-stat');
+                const val = input.value;
+                const outEl = document.getElementById('out-' + statName);
+                
+                if (val === "") {
+                    outEl.textContent = "—";
+                    outEl.classList.add('empty');
+                } else {
+                    const mod = getModifier(val);
+                    const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
+                    outEl.textContent = `${val} / ${modStr}`;
+                    outEl.classList.remove('empty');
+                }
+            });
+
+            // 3. Спасброски
+            const saves = Array.from(document.querySelectorAll('.save-select')).map(s => s.value).filter(v => v !== "");
+            updateOut('out-saves', saves.join(', '));
+
+            // 4. Защиты
+            const vulns = Array.from(document.querySelectorAll('.vuln-select')).map(s => s.value).filter(v => v !== "");
+            const ress = Array.from(document.querySelectorAll('.res-select')).map(s => s.value).filter(v => v !== "");
+            const imms = Array.from(document.querySelectorAll('.imm-select')).map(s => s.value).filter(v => v !== "");
+            
+            updateOut('out-vuln', vulns.join(', '));
+            updateOut('out-res', ress.join(', '));
+            updateOut('out-imm', imms.join(', '));
+
+            // 5. Текстовые блоки
+            updateOut('out-traits', document.getElementById('traits').value);
+            updateOut('out-actions', document.getElementById('actions').value);
+            updateOut('out-bonus-actions', document.getElementById('bonus-actions').value);
+            updateOut('out-reactions', document.getElementById('reactions').value);
+            updateOut('out-legendary-actions', document.getElementById('legendary-actions').value);
+            updateOut('out-description', document.getElementById('description').value);
+        }
+
+        // Навешиваем обработчики событий на все поля ввода, чтобы таблица обновлялась в реальном времени
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('input', updateTable);
+            el.addEventListener('change', updateTable);
+        });
+
+        // Первичный вызов (на случай если поля уже заполнены)
+        updateTable();
+    </script>
 </body>
 </html>
