@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои монстры — D&D</title>
+    <title>Домашний бестиарий — D&D</title>
     <style>
         body {
             font-family: Georgia, serif;
@@ -99,7 +99,7 @@
             font-size: 0.9em;
             position: relative;
         }
-        .monster-card h4 { color: #e8b84b; margin: 0 0 10px 0; font-size: 1.2em; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .monster-card h4 { color: #e8b84b; margin: 0 0 10px 0; font-size: 1.2em; border-bottom: 1px solid #444; padding-bottom: 5px; padding-right: 30px; }
         .monster-card p { margin: 5px 0; }
         .monster-card .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0; }
         .monster-card .delete-btn {
@@ -118,7 +118,7 @@
     </style>
 </head>
 <body>
-    <h1>🗂️ Мои монстры</h1>
+    <h1>🗂️ Домашний бестиарий</h1>
     <p><a href="index.html">← Назад на главную</a> | <a href="monster.html">+ Создать нового монстра</a></p>
 
     <div class="controls">
@@ -181,8 +181,9 @@
                 delFolderBtn.onclick = (e) => {
                     e.stopPropagation(); // Чтобы не срабатывало открытие папки
                     if (confirm(`Вы уверены, что хотите удалить папку "${folder.name}" и всех монстров в ней?`)) {
-                        db.folders.splice(folderIndex, 1);
-                        saveDB(db);
+                        let currentDb = getDB();
+                        currentDb.folders.splice(folderIndex, 1);
+                        saveDB(currentDb);
                         render();
                     }
                 };
@@ -202,7 +203,7 @@
                     const grid = document.createElement('div');
                     grid.className = 'monsters-grid';
 
-                    folder.monsters.forEach((monster, monsterIndex) => {
+                    folder.monsters.forEach((monster) => {
                         const card = document.createElement('div');
                         card.className = 'monster-card';
 
@@ -212,10 +213,15 @@
                         delMonsterBtn.textContent = '✖';
                         delMonsterBtn.title = 'Удалить монстра';
                         delMonsterBtn.onclick = () => {
-                            if (confirm(`Удалить монстра "${monster.name}"?`)) {
-                                folder.monsters.splice(monsterIndex, 1);
-                                saveDB(db);
-                                render();
+                            if (confirm(`Точно удалить монстра "${monster.name}" из этой папки?`)) {
+                                let currentDb = getDB();
+                                let currentFolder = currentDb.folders.find(f => f.name === folder.name);
+                                
+                                if (currentFolder) {
+                                    currentFolder.monsters = currentFolder.monsters.filter(m => m.id !== monster.id);
+                                    saveDB(currentDb);
+                                    render();
+                                }
                             }
                         };
                         card.appendChild(delMonsterBtn);
