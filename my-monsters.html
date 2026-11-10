@@ -212,13 +212,20 @@
                         delMonsterBtn.className = 'delete-btn';
                         delMonsterBtn.textContent = '✖';
                         delMonsterBtn.title = 'Удалить монстра';
-                        delMonsterBtn.onclick = () => {
+                        
+                        // Исправленная логика удаления
+                        delMonsterBtn.onclick = (e) => {
+                            e.stopPropagation();
                             if (confirm(`Точно удалить монстра "${monster.name}" из этой папки?`)) {
+                                // 1. Берем САМУЮ СВЕЖУЮ базу данных на момент клика
                                 let currentDb = getDB();
+                                // 2. Находим нужную папку по её имени
                                 let currentFolder = currentDb.folders.find(f => f.name === folder.name);
                                 
                                 if (currentFolder) {
+                                    // 3. Оставляем только тех монстров, чей ID НЕ совпадает с удаляемым
                                     currentFolder.monsters = currentFolder.monsters.filter(m => m.id !== monster.id);
+                                    // 4. Сохраняем и перерисовываем
                                     saveDB(currentDb);
                                     render();
                                 }
