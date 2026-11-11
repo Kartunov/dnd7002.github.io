@@ -89,17 +89,25 @@
             color: #c9a227;
         }
 
-        /* Синяя карточка (некликабельная заглушка) */
-        .card-blue-disabled {
-            background-color: rgba(27, 40, 56, 0.8);
+       /* Синяя карточка (кликабельная) */
+        .card-blue-clickable {
+            background-color: rgba(27, 40, 56, 0.95);
             border: 1px solid #333;
-            border-left: 5px solid #2c5a8c;
-            color: #8c9eb5;
-            cursor: default; /* Курсор обычная стрелка */
+            border-left: 5px solid #4a90e2; /* Ярко-синяя полоса */
+            text-decoration: none;
+            color: #c9d6e8;
+            cursor: pointer;
         }
 
-        .card-blue-disabled h2 {
-            color: #5a7d9e;
+        .card-blue-clickable:hover {
+            background-color: rgba(35, 51, 71, 1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(74, 144, 226, 0.2);
+            border-color: #4a90e2;
+        }
+
+        .card-blue-clickable h2 {
+            color: #4a90e2; /* Ярко-синий заголовок */
         }
     </style>
 </head>
@@ -112,12 +120,12 @@
             <h2>Инструменты мастера</h2>
             <p>Иди на свет, твоей цели нет в этом подземелье, тебя ждут настоящие приключения</p>
         </a>
-
-        <!-- Синяя карточка-заглушка -->
-        <div class="card card-blue-disabled">
-            <h2>Карта выхода из тюрьмы</h2>
-            <p>Она не кликабельна, нет смысла на меня жать</p>
-        </div>
+        
+         <!-- Синяя карточка-ссылка (НОВАЯ) -->
+        <a href="d6.html" class="card card-blue-clickable">
+            <h2>Первый уровень</h2>
+            <p>От 1 до 6 дополнительных комнат на этаж</p>
+        </a>
     </div>
 </body>
 </html>
