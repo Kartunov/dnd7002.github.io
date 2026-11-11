@@ -1,58 +1,101 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дорога — D&D</title>
-    <link rel="icon" type="image/png" href="favicon.png"> <!-- Твоя иконка -->
     <style>
+        /* Подключаем шрифт для заголовков */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
+
         body {
             font-family: Georgia, serif;
+            /* Фон с текстурой */
             background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #e8e0d0;
             max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
+            box-sizing: border-box;
         }
+
         h1 {
+            font-family: 'Cinzel', serif;
             color: #c9a227;
             border-bottom: 2px solid #c9a227;
             padding-bottom: 10px;
             text-align: center;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-top: 0;
         }
-        a { color: #e8b84b; }
+
+        a {
+            color: #e8b84b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover { color: #fff; }
+
+        .header-nav {
+            text-align: center;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
 
         .card {
-            background-color: #2a2a2a;
-            border-left: 4px solid #c9a227;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 4px;
+            background-color: rgba(42, 42, 42, 0.95);
+            border: 1px solid #444;
+            border-left: 5px solid #c9a227;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
         }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+        }
+
         .card h2 {
             color: #c9a227;
             margin-top: 0;
+            font-family: 'Cinzel', serif;
+            font-size: 1.4em;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
         }
+        
         .card p {
             color: #a89f8c;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-style: italic;
         }
 
         .btn {
             background-color: #c9a227;
             color: #1a1a1a;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 1.1em;
-            font-family: inherit;
+            font-family: 'Cinzel', serif;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .btn:hover { background-color: #e8b84b; }
-        .btn:active { transform: scale(0.98); }
+        .btn:hover { 
+            background-color: #e8b84b; 
+        }
+        .btn:active { 
+            transform: scale(0.98); 
+        }
 
         .results-container {
             margin-top: 20px;
@@ -64,9 +107,17 @@
         .result-item {
             background-color: #1a1a1a;
             border: 1px solid #444;
-            padding: 12px 15px;
+            border-left: 3px solid #555;
+            padding: 15px 20px;
             border-radius: 4px;
             animation: fadeIn 0.3s ease-in-out;
+            font-size: 1.05em;
+            transition: border-color 0.2s;
+        }
+        
+        .result-item:hover {
+            border-left-color: #c9a227;
+            background-color: #222;
         }
         
         .result-item strong {
@@ -78,7 +129,10 @@
             color: #666;
             font-style: italic;
             text-align: center;
-            padding: 10px;
+            padding: 15px;
+            background-color: rgba(26, 26, 26, 0.5);
+            border-radius: 4px;
+            border: 1px dashed #444;
         }
 
         @keyframes fadeIn {
@@ -89,7 +143,9 @@
 </head>
 <body>
     <h1>🛣️ Дорога</h1>
-    <p style="text-align: center;"><a href="index.html">← Назад на главную</a></p>
+    <div class="header-nav">
+        <a href="index.html">← Назад на главную</a>
+    </div>
 
     <!-- Блок 1: Погода -->
     <div class="card">
@@ -288,7 +344,7 @@
         ];
 
         const trinketsData = [
-            // Список 1 (Мумифицированная рука гоблина)
+            // Список 1
             "Мумифицированная рука гоблина", "Кусочек кристалла, слабо светящийся в лунном свете", 
             "Золотая монета, отчеканенная в неизвестной стране", "Дневник, написанный на неизвестном вам языке",
             "Латунное кольцо, которое не темнеет со временем", "Старая стеклянная шахматная фигура",
@@ -336,7 +392,7 @@
             "Шинель, украденная у умирающего солдата", "Пузырёк невидимых чернил, которые можно прочесть только на закате",
             "Бурдюк вина, который наполняется если оставить его на ночь с мертвецом", "Серебряные столовые приборы, которыми король ел в свой последний раз",
             "Подзорная труба, показывающая лишь мир, в котором бушует ужасный шторм", "Медальон с профилем, лицо которого расцарапано",
-            // Список 2 (Форма для печенья в виде единорога)
+            // Список 2
             "Форма для печенья в виде единорога", "Два соединенных тисовых кольца",
             "Серебряное ручное зеркальце с рукоятью в виде нимфы", "Разукрашенный деревянный ключ, чьи бородка меняется каждый день на рассвете",
             "Изящный серебряный медальон с портретами близнецов", "Золотая подвеска-амулет в форме лепрекона",
@@ -393,28 +449,21 @@
         // ЛОГИКА ГЕНЕРАЦИИ
         // ==========================================
 
-        // Функция для получения 5 уникальных элементов из массива
         function getUniqueRandom(arr, count = 5) {
-            // Создаем копию массива, чтобы не менять оригинал
             let pool = [...arr];
             let result = [];
-            
-            // Если элементов меньше 5, выдаем сколько есть
             let limit = Math.min(count, pool.length);
 
             for (let i = 0; i < limit; i++) {
-                // Выбираем случайный индекс из оставшихся
                 const randomIndex = Math.floor(Math.random() * pool.length);
-                // Добавляем в результат и удаляем из пула, чтобы не повторилось
                 result.push(pool.splice(randomIndex, 1)[0]);
             }
             return result;
         }
 
-        // Общая функция для рендера результатов
         function renderResults(containerId, items) {
             const container = document.getElementById(containerId);
-            container.innerHTML = ''; // Очищаем старые
+            container.innerHTML = ''; 
 
             items.forEach(item => {
                 const div = document.createElement('div');
@@ -424,7 +473,6 @@
             });
         }
 
-        // Обработчики кнопок
         document.getElementById('roll-weather-btn').addEventListener('click', () => {
             const results = getUniqueRandom(weatherData, 5);
             renderResults('weather-results', results);
