@@ -561,25 +561,32 @@
                 availableRooms.splice(randIdx, 1);
             }
 
-            // 7. Секретная комната 🔑 (только после генерации основной карты!)
+            // 7. Секретная комната 🔑 (ИСПРАВЛЕНО: ищем только среди соседей существующих комнат)
             let secretRoom = null;
             if (specialRoom1 && specialRoom2) {
-                let found = false;
-                let attemptsSecret = 0;
+                // Создаем список всех пустых клеток, прилегающих к текущим комнатам
+                const possibleSecretSpots = [];
                 
-                // Ищем место строго среди ПУСТЫХ клеток, которые не станут мостом
-                while (!found && attemptsSecret < 1000) {
-                    attemptsSecret++;
-                    const nx = getRandomInt(0, GRID_SIZE - 1);
-                    const ny = getRandomInt(0, GRID_SIZE - 1);
-                    const key = `${nx},${ny}`;
-                    
-                    // Проверяем, что клетка пуста и у неё максимум 2 соседа
-                    if (!roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 2) {
-                        secretRoom = { x: nx, y: ny };
-                        roomsSet.add(key);
-                        found = true;
+                roomsSet.forEach(key => {
+                    const [rx, ry] = key.split(',').map(Number);
+                    // Проверяем 4 направления от каждой комнаты
+                    for (let [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+                        const nx = rx + dx;
+                        const ny = ry + dy;
+                        const nKey = `${nx},${ny}`;
+                        
+                        // Если клетка в пределах сетки, еще не занята, и у неё максимум 2 соседа
+                        if (isValid(nx, ny) && !roomsSet.has(nKey) && countNeighbors(nx, ny, roomsSet) <= 2) {
+                            possibleSecretSpots.push({ x: nx, y: ny });
+                        }
                     }
+                });
+
+                // Если есть подходящие места, выбираем случайное
+                if (possibleSecretSpots.length > 0) {
+                    const randomSpot = getRandomItem(possibleSecretSpots);
+                    secretRoom = randomSpot;
+                    roomsSet.add(`${secretRoom.x},${secretRoom.y}`);
                 }
             }
 
@@ -605,9 +612,8 @@
             dungeonWrapper.classList.add('active');
             legend.classList.add('active');
             
-            // Считаем общее количество комнат
             let totalRooms = roomsSet.size;
-            if (secretRoom) totalRooms++; // Секретная не входит в лимит, но мы её вывели
+            if (secretRoom) totalRooms++;
 
             infoText.textContent = `Этаж готов! Всего комнат: ${totalRooms}. До босса ${maxDistance} шагов.`;
         }
