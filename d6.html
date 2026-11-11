@@ -69,9 +69,10 @@
             margin-bottom: 30px;
         }
 
-        .special-room-container { border-left: 5px solid #a83232; }
-        .mutator-container { border-left: 5px solid #8c2c9e; }
-        .theme-container { border-left: 5px solid #2c9e6b; }
+        /* Убрали красную/фиолетовую/зеленую полоску, теперь все карточки синие */
+        .special-room-container, .mutator-container, .theme-container {
+            border-left: 5px solid #2c5a8c;
+        }
 
         .special-room-container h2, .mutator-container h2, .theme-container h2 {
             font-family: 'Cinzel', serif;
@@ -94,6 +95,7 @@
             transition: all 0.3s ease;
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            align-self: center; /* Центрируем кнопку */
         }
 
         .btn-generate:hover {
@@ -105,15 +107,6 @@
         .btn-generate:active {
             transform: translateY(0);
         }
-
-        .btn-special { background-color: #a83232; color: white; }
-        .btn-special:hover { background-color: #d64545; box-shadow: 0 6px 12px rgba(168, 50, 50, 0.4); }
-
-        .btn-mutator { background-color: #8c2c9e; color: white; }
-        .btn-mutator:hover { background-color: #b03ec9; box-shadow: 0 6px 12px rgba(140, 44, 158, 0.4); }
-
-        .btn-theme { background-color: #2c9e6b; color: white; }
-        .btn-theme:hover { background-color: #3ec98a; box-shadow: 0 6px 12px rgba(44, 158, 107, 0.4); }
 
         /* Обертка для сетки и счетчика */
         .dungeon-wrapper {
@@ -238,21 +231,28 @@
             min-height: 20px;
         }
 
-        /* Блок результата */
-        .result-box {
-            display: none;
-            margin-top: 20px;
+        /* Контейнеры для результатов (история) */
+        .results-history {
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
             background-color: rgba(15, 23, 34, 0.9);
+            border: 1px solid #2c5a8c; /* Синяя обводка для всех карточек */
             border-radius: 8px;
             padding: 20px;
             box-sizing: border-box;
             animation: fadeIn 0.4s ease-out;
+            position: relative;
         }
-        .result-box.active { display: block; }
-        .special-result-box { border: 1px solid #a83232; }
-        .mutator-result-box { border: 1px solid #8c2c9e; }
-        .theme-result-box { border: 1px solid #2c9e6b; text-align: center; }
+
+        .result-card.fade-out {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
 
         .result-title {
             font-family: 'Cinzel', serif;
@@ -260,23 +260,38 @@
             margin-bottom: 10px;
             border-bottom: 1px solid #444;
             padding-bottom: 5px;
+            color: #e8b84b; /* Золотой заголовок для всех */
         }
-        .special-title { color: #e8b84b; }
-        .mutator-title { color: #d673e8; }
-        .theme-title { color: #67e8b6; font-size: 2em; text-align: center; border: none; }
 
         .result-detail {
             font-size: 1.1em;
             color: #c9d6e8;
             margin-bottom: 5px;
         }
-        .result-detail span { font-weight: bold; }
-        .special-detail span { color: #7ab5f5; }
-        .mutator-detail span { color: #d673e8; }
+        .result-detail span { 
+            font-weight: bold; 
+            color: #7ab5f5; /* Синий акцент на деталях */
+        }
+
+        /* Специфичные стили для тем (крупный текст) */
+        .theme-card {
+            text-align: center;
+        }
+        .theme-card .result-title {
+            border: none;
+            font-size: 2em;
+            margin-bottom: 0;
+            color: #67e8b6; /* Оставим зеленый цвет текста для темы */
+        }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(20px); }
         }
     </style>
 </head>
@@ -315,33 +330,22 @@
     <!-- ГЕНЕРАТОР ОСОБЫХ КОМНАТ -->
     <div class="special-room-container">
         <h2>🎲 Генератор особых комнат</h2>
-        <button class="btn-generate btn-special" id="generate-special-btn">Создать комнату</button>
-        
-        <div class="result-box special-result-box" id="special-result">
-            <div class="result-title special-title" id="special-room-name">Название комнаты</div>
-            <div id="special-room-content"></div>
-        </div>
+        <button class="btn-generate" id="generate-special-btn">Создать комнату</button>
+        <div class="results-history" id="special-history"></div>
     </div>
 
     <!-- ГЕНЕРАТОР МУТАТОРОВ -->
     <div class="mutator-container">
         <h2>☣️ Мутаторы подземелья</h2>
-        <button class="btn-generate btn-mutator" id="generate-mutator-btn">Создать мутатор</button>
-        
-        <div class="result-box mutator-result-box" id="mutator-result">
-            <div class="result-title mutator-title">Мутатор</div>
-            <div class="result-detail mutator-detail" id="mutator-content"></div>
-        </div>
+        <button class="btn-generate" id="generate-mutator-btn">Создать мутатор</button>
+        <div class="results-history" id="mutator-history"></div>
     </div>
 
     <!-- ГЕНЕРАТОР ТЕМ -->
     <div class="theme-container">
         <h2>🎨 Генератор тем</h2>
-        <button class="btn-generate btn-theme" id="generate-theme-btn">Создать тему</button>
-        
-        <div class="result-box theme-result-box" id="theme-result">
-            <div class="result-title theme-title" id="theme-content">Тема</div>
-        </div>
+        <button class="btn-generate" id="generate-theme-btn">Создать тему</button>
+        <div class="results-history" id="theme-history"></div>
     </div>
 
     <script>
@@ -353,6 +357,31 @@
         }
         function getRandomItem(arr) {
             return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Универсальная функция для добавления карточки в историю (максимум 3)
+        function addToHistory(containerId, htmlContent, isTheme = false) {
+            const container = document.getElementById(containerId);
+            
+            // Создаем новую карточку
+            const newCard = document.createElement('div');
+            newCard.className = isTheme ? 'result-card theme-card' : 'result-card';
+            newCard.innerHTML = htmlContent;
+
+            // Добавляем в начало
+            container.prepend(newCard);
+
+            // Если карточек больше 3, удаляем самую нижнюю
+            if (container.children.length > 3) {
+                const oldCard = container.lastElementChild;
+                oldCard.classList.add('fade-out');
+                // Ждем окончания анимации и удаляем
+                setTimeout(() => {
+                    if (oldCard.parentNode === container) {
+                        container.removeChild(oldCard);
+                    }
+                }, 300); 
+            }
         }
 
         // ==========================================
@@ -475,9 +504,6 @@
         // ГЕНЕРАТОР ОСОБЫХ КОМНАТ
         // ==========================================
         const specialBtn = document.getElementById('generate-special-btn');
-        const specialResultBox = document.getElementById('special-result');
-        const specialRoomName = document.getElementById('special-room-name');
-        const specialRoomContent = document.getElementById('special-room-content');
 
         function generateSpecialRoom() {
             const roomTypes = ["Торговец", "Квестодатель", "Сокровищница", "Комната Удачи", "Жертвенная комната", "Комната испытаний"];
@@ -486,33 +512,30 @@
 
             switch(roomType) {
                 case "Торговец":
-                    contentHtml = `<div class="result-detail special-detail">Ассортимент: <span>${getRandomItem(["Оружия и посохи", "Доспехи и щиты", "Свитки и расходники", "Мощные артефакты", "Обменник безделушек"])}</span></div>`;
+                    contentHtml = `<div class="result-detail">Ассортимент: <span>${getRandomItem(["Оружия и посохи", "Доспехи и щиты", "Свитки и расходники", "Мощные артефакты", "Обменник безделушек"])}</span></div>`;
                     break;
                 case "Квестодатель":
-                    contentHtml = `<div class="result-detail special-detail">Тип задания: <span>${getRandomItem(["Убийство", "Сбор", "Доставка", "Сопровождение"])}</span></div>`;
+                    contentHtml = `<div class="result-detail">Тип задания: <span>${getRandomItem(["Убийство", "Сбор", "Доставка", "Сопровождение"])}</span></div>`;
                     break;
                 case "Сокровищница":
-                    contentHtml = `<div class="result-detail special-detail">Содержимое: <span>${getRandomItem(["Ближнее оружие", "Дальнее оружие", "Магическое", "Доспех", "Артефакт"])}</span></div>`;
+                    contentHtml = `<div class="result-detail">Содержимое: <span>${getRandomItem(["Ближнее оружие", "Дальнее оружие", "Магическое", "Доспех", "Артефакт"])}</span></div>`;
                     break;
                 case "Комната Удачи":
-                    contentHtml = `<div class="result-detail special-detail">Эффект: <span>${getRandomItem(["Оружие получает преимущество на первые две атаки", "Увеличена скорость перемещения на 10 фт", "В конце каждого хода лечит на к4+БМ", "С шансом в 33% можно не потратить ячейку заклинания", "Ваш урон увеличен на ваш БМ", "Даёт эффект везунчика на один раз", "Оружие получает помеху на первые две атаки", "Уменьшена скорость перемещения на 10 фт", "В конце каждого хода наносит урон на к4+БМ", "С шансом в 33% можно потратить лишнюю ячейку заклинаний", "Ваш урон уменьшен на ваш БМ", "Даёт эффект везунчика против вас на один раз"])}</span></div>`;
+                    contentHtml = `<div class="result-detail">Эффект: <span>${getRandomItem(["Оружие получает преимущество на первые две атаки", "Увеличена скорость перемещения на 10 фт", "В конце каждого хода лечит на к4+БМ", "С шансом в 33% можно не потратить ячейку заклинания", "Ваш урон увеличен на ваш БМ", "Даёт эффект везунчика на один раз", "Оружие получает помеху на первые две атаки", "Уменьшена скорость перемещения на 10 фт", "В конце каждого хода наносит урон на к4+БМ", "С шансом в 33% можно потратить лишнюю ячейку заклинаний", "Ваш урон уменьшен на ваш БМ", "Даёт эффект везунчика против вас на один раз"])}</span></div>`;
                     break;
                 case "Жертвенная комната":
                     contentHtml = `
-                        <div class="result-detail special-detail">Требование: <span>${getRandomItem(["Пожертвовать одной костью максимального здоровья на этаж (66% шанс на награду)", "Пожертвовать возможностью делать короткий отдых (100% шанс на награду, одноразово)", "Пожертвовать рационом (15% шанс на награду)", "Пожертвовать предметом (доспех/оружие/артефакт) (33% шанс на награду)", "Пожертвовать ячейку заклинаний на этаж (66% шанс на награду)", "Пожертвовать 5 фт максимальной скорости на этаж (66% шанс на награду)"])}</span></div>
-                        <div class="result-detail special-detail" style="margin-top: 10px;">Награда: <span>${getRandomItem(["Развеивает эффект 1 мутатора", "Дарует какой-либо магический артефакт", "Дарует какой-либо доспех", "Дарует какое-либо оружие", "Дарует какой-либо из баффов от фонтана до конца этажа", "Дарует знание какие типы комнат находятся рядом", "Даёт эффект длительного отдыха", "Даёт эффект какого-либо дебафа от фонтана до конца этажа"])}</span></div>
+                        <div class="result-detail">Требование: <span>${getRandomItem(["Пожертвовать одной костью максимального здоровья на этаж (66% шанс на награду)", "Пожертвовать возможностью делать короткий отдых (100% шанс на награду, одноразово)", "Пожертвовать рационом (15% шанс на награду)", "Пожертвовать предметом (доспех/оружие/артефакт) (33% шанс на награду)", "Пожертвовать ячейку заклинаний на этаж (66% шанс на награду)", "Пожертвовать 5 фт максимальной скорости на этаж (66% шанс на награду)"])}</span></div>
+                        <div class="result-detail" style="margin-top: 10px;">Награда: <span>${getRandomItem(["Развеивает эффект 1 мутатора", "Дарует какой-либо магический артефакт", "Дарует какой-либо доспех", "Дарует какое-либо оружие", "Дарует какой-либо из баффов от фонтана до конца этажа", "Дарует знание какие типы комнат находятся рядом", "Даёт эффект длительного отдыха", "Даёт эффект какого-либо дебафа от фонтана до конца этажа"])}</span></div>
                     `;
                     break;
                 case "Комната испытаний":
-                    contentHtml = `<div class="result-detail special-detail">Испытание: <span>${getRandomItem(["Пройти комнату без использование рывков", "Пройти комнату без бонусных действий", "Пройти комнату без бонусных умений", "Пройти комнату без реакций", "Пройти комнату не получив урона", "Пройти комнату не используя заклинаний", "Пройти комнату не больше чем за 4 раунда", "Пройти комнату не используя вообще ничего"])}</span></div>`;
+                    contentHtml = `<div class="result-detail">Испытание: <span>${getRandomItem(["Пройти комнату без использование рывков", "Пройти комнату без бонусных действий", "Пройти комнату без бонусных умений", "Пройти комнату без реакций", "Пройти комнату не получив урона", "Пройти комнату не используя заклинаний", "Пройти комнату не больше чем за 4 раунда", "Пройти комнату не используя вообще ничего"])}</span></div>`;
                     break;
             }
 
-            specialRoomName.textContent = roomType;
-            specialRoomContent.innerHTML = contentHtml;
-            specialResultBox.classList.remove('active');
-            void specialResultBox.offsetWidth; 
-            specialResultBox.classList.add('active');
+            const html = `<div class="result-title">${roomType}</div>${contentHtml}`;
+            addToHistory('special-history', html, false);
         }
         specialBtn.addEventListener('click', generateSpecialRoom);
 
@@ -521,8 +544,6 @@
         // ГЕНЕРАТОР МУТАТОРОВ
         // ==========================================
         const mutatorBtn = document.getElementById('generate-mutator-btn');
-        const mutatorResultBox = document.getElementById('mutator-result');
-        const mutatorContent = document.getElementById('mutator-content');
 
         const mutatorsData = [
             "В подземелье очень темно (нужны источники освещения, иногда есть магическая тьма в комнатах)",
@@ -532,26 +553,34 @@
             "Повышенная освещённость (невозможность делать короткий отдых и скрываться из-за магической освещённости)",
             "Местность дикой магии (любое сотворение магии вызывает эффект дикой магии)",
             "Немагическая среда (магия перестаёт работать, частично или везде)",
-            "Металл становится тяжелее (всё металлическое становится тяжелее нормы, оружие имеющее металл в себе бьёт с помехой)"
+            "Металл становится тяжелее (всё металлическое становится тяжелее нормы, оружие имеющее металл в себе бьёт с помехой)",
+            "Некоторые клетки становятся трясиной. Попадание в них — спасбросок Ловкости, иначе скорость 0 и утопание",
+            "Вся поверхность скользкая. При рывке или перемещении более чем на 2 клетки — спасбросок Ловкости, иначе падение",
+            "В случайных местах открываются разломы с лавой (6к6 урона на этих тайлах, а всё что касается их - загорается)",
+            "Область сильно заслонена туманом, дальние атаки имеют помеху, но также преимущество на скрытность",
+            "Движущие потоки - сдувают каждого на 2 клетки в определенную сторону",
+            "Иногда обрушивается пол под ногами (Спас ловкости иначе большой урон)",
+            "После смерти существа взрываются с радиусом в 5 фт, нанося всем 6к6 урона взрывом",
+            "На полу иногда появляются невидимые ловушки-капканы",
+            "Все получают преимущество к броскам атаки",
+            "Здоровье урезано на половину",
+            "В начале каждой комнаты спас МДР 14 иначе получаешь состояние безумия на 1 ход",
+            "Каждый промах - доп к4 на следующую атаку и каждое попадание - отнять к4 от следующей атаки"
         ];
 
         function generateMutator() {
-            mutatorContent.innerHTML = getRandomItem(mutatorsData);
-            mutatorResultBox.classList.remove('active');
-            void mutatorResultBox.offsetWidth;
-            mutatorResultBox.classList.add('active');
+            const text = getRandomItem(mutatorsData);
+            const html = `<div class="result-title">Мутатор</div><div class="result-detail">${text}</div>`;
+            addToHistory('mutator-history', html, false);
         }
         mutatorBtn.addEventListener('click', generateMutator);
 
 
         // ==========================================
-        // ГЕНЕРАТОР ТЕМ (Огромный список)
+        // ГЕНЕРАТОР ТЕМ
         // ==========================================
         const themeBtn = document.getElementById('generate-theme-btn');
-        const themeResultBox = document.getElementById('theme-result');
-        const themeContent = document.getElementById('theme-content');
 
-        // Твой огромный список. Я разбил его по смыслу для удобства, но логика та же.
         const themesData = [
             "свечки", "джунгли", "небеса", "ад", "тюрьма", "катакомбы", "канализация", "облака", "бури", "луга", 
             "вулканы", "ледники", "пустыни", "океаны", "болота", "пещеры", "шахты", "руины", "библиотеки", 
@@ -771,10 +800,9 @@
         ];
 
         function generateTheme() {
-            themeContent.textContent = getRandomItem(themesData);
-            themeResultBox.classList.remove('active');
-            void themeResultBox.offsetWidth;
-            themeResultBox.classList.add('active');
+            const text = getRandomItem(themesData);
+            const html = `<div class="result-title">${text}</div>`;
+            addToHistory('theme-history', html, true);
         }
         themeBtn.addEventListener('click', generateTheme);
     </script>
