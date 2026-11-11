@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор имён — в разработке</title>
+    <title>Генератор имён — D&D</title>
     <style>
         body {
             font-family: Georgia, serif;
             background-color: #1a1a1a;
             color: #e8e0d0;
-            max-width: 800px;
+            max-width: 1200px; /* Шире, чтобы помещалось 4 колонки */
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
@@ -18,26 +18,223 @@
             color: #c9a227;
             border-bottom: 2px solid #c9a227;
             padding-bottom: 10px;
+            text-align: center;
         }
         a {
             color: #e8b84b;
         }
-        .placeholder {
+
+        .header-nav {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Сетка для рас (4 в ряд) */
+        .races-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        @media (max-width: 1000px) {
+            .races-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .races-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Стили для таблички-карточки расы */
+        .race-card {
             background-color: #2a2a2a;
-            border-left: 4px solid #c9a227;
-            padding: 15px 20px;
-            margin: 20px 0;
+            border: 1px solid #444;
             border-radius: 4px;
-            color: #a89f8c;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Заголовок с названием расы (некликабельный) */
+        .race-title {
+            background-color: #333;
+            color: #c9a227;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            text-transform: uppercase;
+            font-size: 1.1em;
+        }
+
+        /* Кнопки Мужское / Женское */
+        .gender-buttons {
+            display: flex;
+            border-bottom: 1px solid #444;
+        }
+        .gender-btn {
+            flex: 1;
+            background-color: #222;
+            color: #e8e0d0;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1em;
+            transition: background-color 0.2s;
+            border-right: 1px solid #444;
+        }
+        .gender-btn:last-child {
+            border-right: none;
+        }
+        .gender-btn:hover {
+            background-color: #444;
+        }
+        .gender-btn:active {
+            background-color: #c9a227;
+            color: #1a1a1a;
+        }
+
+        /* Поля вывода имён */
+        .name-output {
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 0.95em;
+            min-height: 60px;
+            word-wrap: break-word;
+            color: #e8b84b;
+            background-color: #1a1a1a;
         }
     </style>
 </head>
 <body>
     <h1>📜 Генератор имён</h1>
-    <p><a href="index.html">← Назад на главную</a></p>
-
-    <div class="placeholder">
-        <p>Страница в разработке. Здесь скоро появится генератор случайных имён для NPC.</p>
+    <div class="header-nav">
+        <a href="index.html">← Назад на главную</a>
     </div>
+
+    <div class="races-grid" id="races-grid">
+        <!-- Сюда будут вставляться таблички рас -->
+    </div>
+
+    <script>
+        // ==========================================
+        // БАЗЫ ДАННЫХ ИМЁН
+        // ==========================================
+        
+        // Пока тут только люди, остальные добавим по мере необходимости
+        const databases = {
+            "Люди": {
+                male: [
+                    "Блас", "Бран", "Гет", "Ландер", "Лют", "Максер", "Стор", "Таман", "Урт", "Фрат", "Эндер", 
+                    "Ассир", "Барденд", "Зашеир", "Кхемед", "Мехмен", "Сулейман", "Хассид", "Аот", "Барерис", 
+                    "Кетот", "Мумед", "Рамас", "Со-Кехур", "Ткавар-Де", "Урду", "Эктут-Ки", "Бориник", "Ваддислав", 
+                    "Джаллар", "Капитар", "Мадислав", "Рамышевик", "Фаура", "Шаумар", "Антон", "Диеро", "Маркон", 
+                    "Пьерон", "Римардо", "Ромеро", "Салазар", "Умберо", "Горетат", "Грим", "Дарвин", "Дорн", 
+                    "Маларк", "Морн", "Рэндда", "Стелд", "Хельм", "Эвендур"
+                ],
+                female: [
+                    "Амафрея", "Ветха", "Вестра", "Кетра", "Мара", "Ольга", "Силифрей", "Цефрея", "Атала", 
+                    "Джасама", "Зашеида", "Мейлиль", "Сейдиль", "Сейпора", "Хама", "Яшенра", "Арнзила", "Золис", 
+                    "Мурит", "Нефис", "Нулара", "Сефикс", "Тола", "Умара", "Чатхи", "Имзель", "Иммит", "Навара", 
+                    "Таммит", "Файвара", "Худмара", "Шевара", "Юльдра", "Балама", "Вонда", "Джалана", "Дона", 
+                    "Куара", "Ауна", "Марта", "Селизе", "Фаила", "Арвин", "Джессаил", "Керри", "Аурин", 
+                    "Мири", "Рован", "Тесселе", "Шандри", "Эевс"
+                ]
+            }
+            // Сюда будем добавлять другие расы (Эльфы, Дварфы и т.д.)
+        };
+
+        // ==========================================
+        // ЛОГИКА ГЕНЕРАЦИИ
+        // ==========================================
+
+        const racesGrid = document.getElementById('races-grid');
+
+        // Функция для выбора случайного элемента из массива
+        function getRandomElement(arr) {
+            if (!arr || arr.length === 0) return "";
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Функция для отрисовки всех рас
+        function renderRaces() {
+            racesGrid.innerHTML = ''; // Очищаем сетку
+
+            // Перебираем все расы из базы данных
+            for (const [raceName, data] of Object.entries(databases)) {
+                
+                // Создаем контейнер для одной расы
+                const raceCard = document.createElement('div');
+                raceCard.className = 'race-card';
+
+                // 1. Заголовок расы (некликабельный)
+                const title = document.createElement('div');
+                title.className = 'race-title';
+                title.textContent = raceName;
+                raceCard.appendChild(title);
+
+                // 2. Блок с кнопками
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'gender-buttons';
+
+                const maleBtn = document.createElement('button');
+                maleBtn.className = 'gender-btn';
+                maleBtn.textContent = 'Мужское';
+                
+                const femaleBtn = document.createElement('button');
+                femaleBtn.className = 'gender-btn';
+                femaleBtn.textContent = 'Женское';
+
+                btnContainer.appendChild(maleBtn);
+                btnContainer.appendChild(femaleBtn);
+                raceCard.appendChild(btnContainer);
+
+                // 3. Поле для вывода
+                const outputDiv = document.createElement('div');
+                outputDiv.className = 'name-output';
+                raceCard.appendChild(outputDiv);
+
+                // Храним имена для этой конкретной таблицы в массивах
+                let currentMaleNames = [];
+                let currentFemaleNames = [];
+
+                // Вспомогательная функция для обновления текста в поле вывода
+                function updateOutput() {
+                    // Собираем все имена, разделяя их запятой
+                    let allNames = [];
+                    if (currentMaleNames.length > 0) allNames.push(currentMaleNames.join(', '));
+                    if (currentFemaleNames.length > 0) allNames.push(currentFemaleNames.join(', '));
+                    
+                    outputDiv.textContent = allNames.join(' | '); // Разделяем мужские и женские вертикальной чертой
+                }
+
+                // Логика для кнопки "Мужское"
+                maleBtn.onclick = () => {
+                    const newName = getRandomElement(data.male);
+                    currentMaleNames.push(newName);
+                    // Оставляем только 3 последних имени
+                    if (currentMaleNames.length > 3) {
+                        currentMaleNames.shift(); 
+                    }
+                    updateOutput();
+                };
+
+                // Логика для кнопки "Женское"
+                femaleBtn.onclick = () => {
+                    const newName = getRandomElement(data.female);
+                    currentFemaleNames.push(newName);
+                    // Оставляем только 3 последних имени
+                    if (currentFemaleNames.length > 3) {
+                        currentFemaleNames.shift(); 
+                    }
+                    updateOutput();
+                };
+
+                // Добавляем готовую карточку в сетку
+                racesGrid.appendChild(raceCard);
+            }
+        }
+
+        // Запускаем отрисовку при загрузке
+        renderRaces();
+    </script>
 </body>
 </html>
