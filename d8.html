@@ -345,7 +345,7 @@
                 
                 <div class="counter-panel">
                     <div class="counter-title">Счётчик этажей</div>
-                    <div class="counter-display" id="floor-count">2</div>
+                    <div class="counter-display" id="floor-count">1</div>
                     <div class="counter-buttons">
                         <button class="btn-counter" id="btn-minus">-</button>
                         <button class="btn-counter" id="btn-plus">+</button>
@@ -448,7 +448,7 @@
         const btnPlus = document.getElementById('btn-plus');
         const btnMinus = document.getElementById('btn-minus');
         
-        let currentFloor = 2;
+        let currentFloor = 1;
 
         btnPlus.addEventListener('click', () => { currentFloor++; floorCountDisplay.textContent = currentFloor; });
         btnMinus.addEventListener('click', () => { if (currentFloor > 1) { currentFloor--; floorCountDisplay.textContent = currentFloor; } });
@@ -527,19 +527,16 @@
             let event2 = null, icon2 = '';
             
             if (availableRooms.length >= 2) {
-                // Первая комната
                 let randIdx1 = getRandomInt(0, availableRooms.length - 1);
                 event1 = availableRooms[randIdx1];
                 icon1 = Math.random() < 0.5 ? '⚠️' : '🧩';
                 availableRooms.splice(randIdx1, 1);
 
-                // Вторая комната
                 let randIdx2 = getRandomInt(0, availableRooms.length - 1);
                 event2 = availableRooms[randIdx2];
                 icon2 = Math.random() < 0.5 ? '⚠️' : '🧩';
                 availableRooms.splice(randIdx2, 1);
             } else if (availableRooms.length === 1) {
-                // Если комната всего одна, ставим один ивент
                 let randIdx = getRandomInt(0, availableRooms.length - 1);
                 event1 = availableRooms[randIdx];
                 icon1 = Math.random() < 0.5 ? '⚠️' : '🧩';
@@ -551,7 +548,6 @@
             let specialRoom2 = null;
 
             if (availableRooms.length >= 6) {
-                // 2 особые
                 let randIdx1 = getRandomInt(0, availableRooms.length - 1);
                 specialRoom1 = availableRooms[randIdx1];
                 availableRooms.splice(randIdx1, 1);
@@ -560,44 +556,29 @@
                 specialRoom2 = availableRooms[randIdx2];
                 availableRooms.splice(randIdx2, 1);
             } else if (availableRooms.length >= 3) {
-                // 1 особая
                 let randIdx = getRandomInt(0, availableRooms.length - 1);
                 specialRoom1 = availableRooms[randIdx];
                 availableRooms.splice(randIdx, 1);
             }
 
-            // 7. Секретная комната 🔑 (если есть обе особые)
+            // 7. Секретная комната 🔑 (только после генерации основной карты!)
             let secretRoom = null;
             if (specialRoom1 && specialRoom2) {
-                // Ищем место, где максимум 2 соседа
                 let found = false;
                 let attemptsSecret = 0;
                 
-                // Сначала пробуем среди свободных комнат
-                const availableForSecret = [...availableRooms];
-                while (!found && availableForSecret.length > 0) {
-                    let randIdx = getRandomInt(0, availableForSecret.length - 1);
-                    let candidate = availableForSecret[randIdx];
-                    if (countNeighbors(candidate.x, candidate.y, roomsSet) <= 2) {
-                        secretRoom = candidate;
+                // Ищем место строго среди ПУСТЫХ клеток, которые не станут мостом
+                while (!found && attemptsSecret < 1000) {
+                    attemptsSecret++;
+                    const nx = getRandomInt(0, GRID_SIZE - 1);
+                    const ny = getRandomInt(0, GRID_SIZE - 1);
+                    const key = `${nx},${ny}`;
+                    
+                    // Проверяем, что клетка пуста и у неё максимум 2 соседа
+                    if (!roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 2) {
+                        secretRoom = { x: nx, y: ny };
+                        roomsSet.add(key);
                         found = true;
-                    }
-                    availableForSecret.splice(randIdx, 1);
-                }
-
-                // Если среди готовых не нашли, ищем по всей сетке
-                if (!found) {
-                    let attemptsAll = 0;
-                    while (!found && attemptsAll < 500) {
-                        attemptsAll++;
-                        const nx = getRandomInt(0, GRID_SIZE - 1);
-                        const ny = getRandomInt(0, GRID_SIZE - 1);
-                        const key = `${nx},${ny}`;
-                        if (!roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 2) {
-                            secretRoom = { x: nx, y: ny };
-                            roomsSet.add(key);
-                            found = true;
-                        }
                     }
                 }
             }
@@ -623,7 +604,12 @@
 
             dungeonWrapper.classList.add('active');
             legend.classList.add('active');
-            infoText.textContent = `Этаж готов! Комнат: ${roomsSet.size}. До босса ${maxDistance} шагов.`;
+            
+            // Считаем общее количество комнат
+            let totalRooms = roomsSet.size;
+            if (secretRoom) totalRooms++; // Секретная не входит в лимит, но мы её вывели
+
+            infoText.textContent = `Этаж готов! Всего комнат: ${totalRooms}. До босса ${maxDistance} шагов.`;
         }
         generateBtn.addEventListener('click', generateDungeon);
 
