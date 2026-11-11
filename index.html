@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Инструменты мастера — D&D</title>
     <style>
-        /* Подключаем шрифт для заголовков (по желанию) */
+        /* Подключаем шрифт для заголовков */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
 
         body {
             font-family: Georgia, serif;
-            /* Фон с текстурой старой бумаги/камня */
+            /* Фон с текстурой */
             background-color: #1a1a1a;
             background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #e8e0d0;
@@ -26,7 +26,7 @@
 
         /* Общий контейнер для контента */
         .container {
-            max-width: 1100px;
+            max-width: 1150px;
             width: 100%;
         }
 
@@ -49,55 +49,83 @@
             font-size: 1.1em;
         }
 
-        /* Сетка карточек */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        /* Адаптивность для мобильных */
-        @media (max-width: 900px) {
-            .grid-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 600px) {
-            .grid-container {
-                grid-template-columns: 1fr;
-            }
-        }
-                /* Обертка для сетки и вертикальной карточки */
+        /* Обертка для сетки и вертикальной карточки */
         .layout-wrapper {
             display: flex;
             gap: 20px;
-            align-items: stretch; /* Растягиваем по высоте */
+            align-items: stretch;
         }
 
-        /* Сетка карточек (занимает всё доступное место) */
+        /* Сетка карточек (левая часть) */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            flex: 1; /* Занимает всё оставшееся место */
+            flex: 1; /* Занимает всё доступное место */
         }
 
-        /* Синяя карточка */
-        .card-blue {
+        /* Стили для желтых карточек */
+        .card {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            background-color: rgba(27, 40, 56, 0.95); /* Тёмно-синий */
+            background-color: rgba(42, 42, 42, 0.9);
             border: 1px solid #444;
-            border-left: 5px solid #4a90e2; /* Синяя полоса */
+            border-left: 5px solid #c9a227;
             padding: 25px 20px;
             border-radius: 4px;
             text-decoration: none;
             color: #e8e0d0;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            width: 200px; /* Фиксированная ширина для вертикальности */
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            background-color: rgba(51, 51, 51, 1);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(201, 162, 39, 0.2);
+            border-color: #c9a227;
+        }
+
+        .card h2 {
+            color: #c9a227;
+            margin-top: 0;
+            font-size: 1.4em;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .card p {
+            margin-bottom: 0;
+            flex-grow: 1;
+            font-size: 0.95em;
+        }
+
+        .card-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 2px #000;
+        }
+
+        /* Стили для синей вертикальной карточки */
+        .card-blue {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: rgba(27, 40, 56, 0.95);
+            border: 1px solid #444;
+            border-left: 5px solid #4a90e2;
+            padding: 25px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #e8e0d0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            width: 220px; /* Фиксированная ширина для вертикальности */
             text-align: center;
+            box-sizing: border-box;
         }
 
         .card-blue:hover {
@@ -121,7 +149,7 @@
             font-size: 0.95em;
         }
 
-        /* Адаптивность для мобильных: карточка встает вниз */
+        /* Адаптивность для мобильных */
         @media (max-width: 1050px) {
             .layout-wrapper {
                 flex-direction: column;
@@ -131,6 +159,7 @@
                 flex-direction: row;
                 align-items: center;
                 gap: 20px;
+                padding: 25px;
             }
             .card-blue h2 {
                 border-bottom: none;
@@ -138,100 +167,89 @@
                 padding-bottom: 0;
                 padding-right: 20px;
                 margin: 0;
+                text-align: left;
+            }
+            .card-blue p {
+                text-align: left;
             }
         }
 
-        /* Стили карточек */
-        .card {
-            display: flex;
-            flex-direction: column;
-            background-color: rgba(42, 42, 42, 0.9); /* Полупрозрачный фон, чтобы текстура была видна */
-            border: 1px solid #444;
-            border-left: 5px solid #c9a227;
-            padding: 25px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #e8e0d0;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            height: 100%;
-            box-sizing: border-box;
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
-
-        .card:hover {
-            background-color: rgba(51, 51, 51, 1);
-            transform: translateY(-5px); /* Приподнимаем карточку при наведении */
-            box-shadow: 0 8px 15px rgba(201, 162, 39, 0.2);
-            border-color: #c9a227;
-        }
-
-        .card h2 {
-            color: #c9a227;
-            margin-top: 0;
-            font-size: 1.4em;
-            border-bottom: 1px solid #444;
-            padding-bottom: 10px;
-            font-family: 'Cinzel', serif;
-        }
-
-        .card p {
-            margin-bottom: 0;
-            flex-grow: 1; /* Распределяет текст по высоте карточки */
-            font-size: 0.95em;
-        }
-
-        /* Иконка в карточке */
-        .card-icon {
-            font-size: 2em;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 2px #000;
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            .card-blue {
+                flex-direction: column;
+                text-align: center;
+            }
+            .card-blue h2 {
+                border-right: none;
+                border-bottom: 1px solid #4a90e2;
+                padding-right: 0;
+                padding-bottom: 10px;
+                text-align: center;
+            }
+            .card-blue p {
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
-        <div class="layout-wrapper">
-        <!-- ЛЕВАЯ ЧАСТЬ: Сетка из 6 карточек -->
-        <div class="grid-container">
-            <!-- ВЕРХНИЙ РЯД -->
-            <a class="card" href="npc.html">
-                <div class="card-icon">📜</div>
-                <h2>Генератор имён</h2>
-                <p>Случайные имена для всяких неписей.</p>
-            </a>
-            <a class="card" href="quest.html">
-                <div class="card-icon">📌</div>
-                <h2>Доска с заданиями</h2>
-                <p>Таблица не заготовленных сайд-квестов.</p>
-            </a>
-            <a class="card" href="combat.html">
-                <div class="card-icon">⚔️</div>
-                <h2>Боевой трекер</h2>
-                <p>Всё что нужно для отслеживания битв в одном месте.</p>
-            </a>
+    <div class="container">
+        <!-- Возвращаем заголовок и подзаголовок на место -->
+        <h1>⚔️ Инструменты мастера</h1>
+        <p class="subtitle">Набор генераторов и помощников для нашей D&D кампании.</p>
 
-            <!-- НИЖНИЙ РЯД -->
-            <a class="card" href="road.html">
-                <div class="card-icon">🛣️</div>
-                <h2>Дорога</h2>
-                <p>Погодные явления и штуки, которые могут случиться в пути.</p>
-            </a>
-            <a class="card" href="random.html">
-                <div class="card-icon">🎲</div>
-                <h2>Всякие случайности</h2>
-                <p>Табличные генераторы, связанные с оружием или всякими вещами.</p>
-            </a>
-            <a class="card" href="monster.html">
-                <div class="card-icon">🐉</div>
-                <h2>Создатель монстров</h2>
-                <p>Небольшой генератор упрощённого статблока монстра.</p>
+        <div class="layout-wrapper">
+            <!-- ЛЕВАЯ ЧАСТЬ: Сетка из 6 карточек -->
+            <div class="grid-container">
+                <!-- ВЕРХНИЙ РЯД -->
+                <a class="card" href="npc.html">
+                    <div class="card-icon">📜</div>
+                    <h2>Генератор имён</h2>
+                    <p>Случайные имена для всяких неписей.</p>
+                </a>
+                <a class="card" href="quest.html">
+                    <div class="card-icon">📌</div>
+                    <h2>Доска с заданиями</h2>
+                    <p>Таблица не заготовленных сайд-квестов.</p>
+                </a>
+                <a class="card" href="combat.html">
+                    <div class="card-icon">⚔️</div>
+                    <h2>Боевой трекер</h2>
+                    <p>Всё что нужно для отслеживания битв в одном месте.</p>
+                </a>
+
+                <!-- НИЖНИЙ РЯД -->
+                <a class="card" href="road.html">
+                    <div class="card-icon">🛣️</div>
+                    <h2>Дорога</h2>
+                    <p>Погодные явления и штуки, которые могут случиться в пути.</p>
+                </a>
+                <a class="card" href="random.html">
+                    <div class="card-icon">🎲</div>
+                    <h2>Всякие случайности</h2>
+                    <p>Табличные генераторы, связанные с оружием или всякими вещами.</p>
+                </a>
+                <a class="card" href="monster.html">
+                    <div class="card-icon">🐉</div>
+                    <h2>Создатель монстров</h2>
+                    <p>Небольшой генератор упрощённого статблока монстра.</p>
+                </a>
+            </div>
+
+            <!-- ПРАВАЯ ЧАСТЬ: Вертикальная синяя карточка -->
+            <a class="card-blue" href="kadgar.html">
+                <h2>Инструменты Кадгара</h2>
+                <p>Хватит играть в днд, настало время погрузиться в настоящие подземелья</p>
             </a>
         </div>
-
-        <!-- ПРАВАЯ ЧАСТЬ: Вертикальная синяя карточка -->
-        <a class="card-blue" href="kadgar.html">
-            <h2>Инструменты Кадгара</h2>
-            <p>Хватит играть в днд, настало время погрузиться в настоящие подземелья</p>
-        </a>
     </div>
 </body>
 </html>
