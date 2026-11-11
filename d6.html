@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="favicon-blue.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Первый уровень — в разработке</title>
+    <title>Первый уровень — Генератор этажа</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
 
@@ -13,12 +13,15 @@
             background-color: #0f1722; 
             background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #c9d6e8;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
             box-sizing: border-box;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h1 {
@@ -51,15 +54,89 @@
             font-size: 1.1em;
         }
 
-        .placeholder {
+        /* Контейнер для генератора */
+        .generator-container {
             background-color: rgba(27, 40, 56, 0.8);
             border: 1px solid #333;
             border-left: 5px solid #2c5a8c;
-            padding: 20px 25px;
-            margin: 20px 0;
+            padding: 25px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 650px; /* Чтобы сетка помещалась */
+        }
+
+        /* Кнопка */
+        .btn-generate {
+            background-color: #4a90e2;
+            color: #0f1722;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
             border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn-generate:hover {
+            background-color: #7ab5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        /* Сетка 15x15 */
+        .grid-container {
+            display: none; /* Скрыто, пока не сгенерировано */
+            grid-template-columns: repeat(15, 30px);
+            grid-template-rows: repeat(15, 30px);
+            gap: 4px; /* Зазор между кубиками */
+            background-color: #0a0f16;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .grid-container.active {
+            display: grid;
+        }
+
+        /* Ячейка (комната) */
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #333; /* Темный фон (пустота) */
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        /* Комната подземелья */
+        .cell.room {
+            background-color: #5a636e; /* Серый цвет как на фото */
+            box-shadow: inset 0 0 5px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
+
+        .cell.room:hover {
+            background-color: #7a8491;
+        }
+
+        /* Текст-подсказка */
+        .info-text {
+            margin-top: 15px;
+            font-size: 0.9em;
             color: #8c9eb5;
             text-align: center;
+            min-height: 20px;
         }
     </style>
 </head>
@@ -67,8 +144,138 @@
     <h1>🎲 Первый уровень</h1>
     <a href="kadgar.html" class="nav-link">← Назад в Инструменты Кадгара</a>
 
-    <div class="placeholder">
-        <p>Страница в разработке. Здесь скоро появится генератор дополнительных комнат для этажа подземелья.</p>
+    <div class="generator-container">
+        <button class="btn-generate" id="generate-btn">Создать этаж</button>
+        
+        <!-- Сетка -->
+        <div class="grid-container" id="grid"></div>
+        
+        <div class="info-text" id="info"></div>
     </div>
+
+    <script>
+        // ==== НАСТРОЙКИ ГЕНЕРАЦИИ ====
+        const GRID_SIZE = 15;
+        const MIN_ROOMS = 4; // 3 стартовые + 1 минимальная дополнительная
+        const MAX_ROOMS = 9; // 3 стартовые + 6 максимальных дополнительных
+        
+        const gridContainer = document.getElementById('grid');
+        const generateBtn = document.getElementById('generate-btn');
+        const infoText = document.getElementById('info');
+
+        // Вспомогательная функция для получения случайного числа в диапазоне
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Проверка, не выходит ли клетка за границы сетки
+        function isValid(x, y) {
+            return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
+        }
+
+        // Подсчет количества соседей у клетки
+        function countNeighbors(x, y, roomsSet) {
+            let count = 0;
+            const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]]; // Вверх, вниз, влево, вправо
+            for (let [dx, dy] of dirs) {
+                if (roomsSet.has(`${x + dx},${y + dy}`)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        // ==== ОСНОВНАЯ ФУНКЦИЯ ГЕНЕРАЦИИ ====
+        function generateDungeon() {
+            // Очищаем сетку
+            gridContainer.innerHTML = '';
+            
+            // Множество для хранения координат комнат (в виде "x,y")
+            const roomsSet = new Set();
+            
+            // 1. Создаем базовую структуру (3 соединенные комнаты)
+            // Начинаем с центра
+            const startX = Math.floor(GRID_SIZE / 2);
+            const startY = Math.floor(GRID_SIZE / 2);
+            
+            roomsSet.add(`${startX},${startY}`);
+            
+            // Добавляем 2 соседние комнаты (получится линия или уголок из 3-х)
+            let added = 1;
+            while (added < 3) {
+                // Берем случайную комнату из уже существующих
+                const roomsArray = Array.from(roomsSet);
+                const randomRoom = roomsArray[getRandomInt(0, roomsArray.length - 1)];
+                const [cx, cy] = randomRoom.split(',').map(Number);
+                
+                // Пробуем добавить соседа в случайном направлении
+                const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+                const [dx, dy] = dirs[getRandomInt(0, 3)];
+                
+                const nx = cx + dx;
+                const ny = cy + dy;
+                const key = `${nx},${ny}`;
+                
+                // Если клетка в пределах сетки, еще не занята и у неё не больше 1 соседа
+                if (isValid(nx, ny) && !roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 1) {
+                    roomsSet.add(key);
+                    added++;
+                }
+            }
+
+            // 2. Добавляем от 1 до 6 комнат случайным образом (хаотично)
+            const extraRooms = getRandomInt(1, 6);
+            let attempts = 0;
+            let extraAdded = 0;
+
+            while (extraAdded < extraRooms && attempts < 500) {
+                attempts++;
+                
+                // Берем случайную комнату
+                const roomsArray = Array.from(roomsSet);
+                const randomRoom = roomsArray[getRandomInt(0, roomsArray.length - 1)];
+                const [cx, cy] = randomRoom.split(',').map(Number);
+                
+                const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+                const [dx, dy] = dirs[getRandomInt(0, 3)];
+                
+                const nx = cx + dx;
+                const ny = cy + dy;
+                const key = `${nx},${ny}`;
+                
+                // Проверки: 
+                // 1. В пределах сетки
+                // 2. Клетка пуста
+                // 3. У новой клетки будет не больше 2 соседей (тогда вместе с текущей будет 3)
+                if (isValid(nx, ny) && !roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 2) {
+                    roomsSet.add(key);
+                    extraAdded++;
+                }
+            }
+
+            // 3. Отрисовка сетки 15x15
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    
+                    if (roomsSet.has(`${x},${y}`)) {
+                        cell.classList.add('room');
+                    }
+                    
+                    gridContainer.appendChild(cell);
+                }
+            }
+
+            // Показываем сетку
+            gridContainer.classList.add('active');
+            
+            // Обновляем текст
+            infoText.textContent = `Сгенерировано комнат: ${roomsSet.size} (База: 3 + Доп: ${roomsSet.size - 3})`;
+        }
+
+        // Вешаем обработчик на кнопку
+        generateBtn.addEventListener('click', generateDungeon);
+    </script>
 </body>
 </html>
