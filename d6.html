@@ -54,7 +54,6 @@
             font-size: 1.1em;
         }
 
-        /* Контейнер для генератора */
         .generator-container {
             background-color: rgba(27, 40, 56, 0.8);
             border: 1px solid #333;
@@ -68,7 +67,6 @@
             max-width: 650px; 
         }
 
-        /* Кнопка */
         .btn-generate {
             background-color: #4a90e2;
             color: #0f1722;
@@ -94,7 +92,6 @@
             transform: translateY(0);
         }
 
-        /* Сетка 15x15 */
         .grid-container {
             display: none; 
             grid-template-columns: repeat(15, 30px);
@@ -110,7 +107,6 @@
             display: grid;
         }
 
-        /* Ячейка */
         .cell {
             width: 30px;
             height: 30px;
@@ -125,13 +121,11 @@
             user-select: none; 
         }
 
-        /* Комната */
         .cell.room {
             background-color: #5a636e; 
             box-shadow: inset 0 0 5px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Легенда */
         .legend {
             display: none;
             margin-top: 20px;
@@ -161,7 +155,6 @@
             text-align: center;
         }
 
-        /* Подсказки */
         .info-text {
             margin-top: 15px;
             font-size: 0.9em;
@@ -178,22 +171,20 @@
     <div class="generator-container">
         <button class="btn-generate" id="generate-btn">Создать этаж</button>
         
-        <!-- Сетка -->
         <div class="grid-container" id="grid"></div>
         
-        <!-- Легенда -->
         <div class="legend" id="legend">
             <div class="legend-item"><span class="legend-icon">🚩</span> <span>Старт</span></div>
             <div class="legend-item"><span class="legend-icon">💀</span> <span>Босс (финиш)</span></div>
             <div class="legend-item"><span class="legend-icon">⚠️</span> <span>Ловушки и награда</span></div>
             <div class="legend-item"><span class="legend-icon">🧩</span> <span>Головоломка и награда</span></div>
+            <div class="legend-item"><span class="legend-icon">❓</span> <span>Особая клетка</span></div>
         </div>
 
         <div class="info-text" id="info"></div>
     </div>
 
     <script>
-        // ==== НАСТРОЙКИ ГЕНЕРАЦИИ ====
         const GRID_SIZE = 15;
         
         const gridContainer = document.getElementById('grid');
@@ -220,17 +211,16 @@
             return count;
         }
 
-        // ==== ГЕНЕРАЦИЯ ====
         function generateDungeon() {
             gridContainer.innerHTML = '';
             const roomsSet = new Set();
             
-            // 1. Старт в центре
+            // 1. Старт
             const startX = Math.floor(GRID_SIZE / 2);
             const startY = Math.floor(GRID_SIZE / 2);
             roomsSet.add(`${startX},${startY}`);
             
-            // 2. База (3 соединенные комнаты)
+            // 2. База
             let added = 1;
             while (added < 3) {
                 const roomsArray = Array.from(roomsSet);
@@ -248,7 +238,7 @@
                 }
             }
 
-            // 3. Случайные дополнительные комнаты
+            // 3. Доп. комнаты
             const extraRooms = getRandomInt(1, 6);
             let attempts = 0;
             let extraAdded = 0;
@@ -270,7 +260,7 @@
                 }
             }
 
-            // 4. Поиск самой далекой комнаты (BFS)
+            // 4. Поиск босса (BFS)
             const queue = [{ x: startX, y: startY, dist: 0 }];
             const visited = new Set();
             visited.add(`${startX},${startY}`);
@@ -298,8 +288,7 @@
                 }
             }
 
-            // 5. Выбор случайной комнаты для события
-            // Собираем все комнаты, кроме старта и босса
+            // 5. Сбор свободных комнат
             const availableRooms = [];
             roomsSet.forEach(key => {
                 const [x, y] = key.split(',').map(Number);
@@ -310,16 +299,26 @@
                 }
             });
 
-            // Если есть свободные комнаты, выбираем одну
+            // 6. Случайная комната с событием
             let eventRoom = null;
             let eventIcon = '';
             if (availableRooms.length > 0) {
-                eventRoom = availableRooms[getRandomInt(0, availableRooms.length - 1)];
-                // 50/50 шанс на ловушку или головоломку
+                const randomIndex = getRandomInt(0, availableRooms.length - 1);
+                eventRoom = availableRooms[randomIndex];
                 eventIcon = Math.random() < 0.5 ? '⚠️' : '🧩';
+                
+                // Удаляем её из списка свободных, чтобы на неё не встал знак вопроса
+                availableRooms.splice(randomIndex, 1);
             }
 
-            // 6. Отрисовка
+            // 7. Особая клетка (если осталось 3 или больше свободных)
+            let specialRoom = null;
+            if (availableRooms.length >= 3) {
+                const randomIndex = getRandomInt(0, availableRooms.length - 1);
+                specialRoom = availableRooms[randomIndex];
+            }
+
+            // 8. Отрисовка
             for (let y = 0; y < GRID_SIZE; y++) {
                 for (let x = 0; x < GRID_SIZE; x++) {
                     const cell = document.createElement('div');
@@ -332,10 +331,13 @@
                             cell.textContent = '🚩';
                         }
                         else if (x === farthestRoom.x && y === farthestRoom.y) {
-                            cell.textContent = '💀'; // Заменили финиш на череп
+                            cell.textContent = '💀'; 
                         }
                         else if (eventRoom && x === eventRoom.x && y === eventRoom.y) {
                             cell.textContent = eventIcon;
+                        }
+                        else if (specialRoom && x === specialRoom.x && y === specialRoom.y) {
+                            cell.textContent = '❓';
                         }
                     }
                     
