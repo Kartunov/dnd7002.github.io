@@ -113,6 +113,21 @@
     <div class="races-grid" id="races-grid">
         <!-- Сюда будут вставляться таблички рас -->
     </div>
+        <!-- ТАБЛИЦА ПРОЗВИЩ -->
+    <div class="nicknames-card" style="margin-top: 40px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 4px; overflow: hidden;">
+        
+        <!-- Строка 1: Прозвища -->
+        <div style="display: flex; border-bottom: 1px solid #444;">
+            <button id="btn-nicknames" style="flex: 1; background-color: #333; color: #c9a227; border: none; border-right: 1px solid #444; padding: 15px; font-family: inherit; font-size: 1.1em; cursor: pointer; text-align: left;">Прозвища</button>
+            <div id="output-nicknames" style="flex: 2; padding: 15px; background-color: #1a1a1a; color: #e8b84b; display: flex; align-items: center; font-size: 0.95em;">—</div>
+        </div>
+
+        <!-- Строка 2: Смешные прозвища -->
+        <div style="display: flex;">
+            <button id="btn-funny-nicknames" style="flex: 1; background-color: #333; color: #c9a227; border: none; border-right: 1px solid #444; padding: 15px; font-family: inherit; font-size: 1.1em; cursor: pointer; text-align: left;">Смешные прозвища</button>
+            <div id="output-funny-nicknames" style="flex: 2; padding: 15px; background-color: #1a1a1a; color: #e8b84b; display: flex; align-items: center; font-size: 0.95em;">—</div>
+        </div>
+    </div>
 
     <script>
         // ==========================================
@@ -361,6 +376,62 @@
 
         // Запускаем отрисовку при загрузке
         renderRaces();
+            // ==========================================
+        // ПРОЗВИЩА
+        // ==========================================
+
+        const nicknamesData = [
+            "Безжалостный", "Кровавый", "Мудрый", "Среброрукий", "Железный", "Пламенный", "Тихий", "Громогласный", 
+            "Хитрый", "Верный", "Непокорный", "Странник", "Забытый", "Проклятый", "Благословенный", "Теневой", 
+            "Солнечный", "Лунный", "Змеиный", "Волчий", "Медвежий", "Драконий", "Орлиный", "Львиный", "Вороний", 
+            "Каменный", "Стальной", "Золотой", "Серебряный", "Медный", "Бархатный", "Шелковый", "Кожаный", 
+            "Костяной", "Призрачный", "Огненный", "Ледяной", "Грозовой", "Ветряный", "Земляной", "Морской", 
+            "Небесный", "Подземный", "Двуликий", "Трижды Клятый", "Вечно Пьяный", "Неуловимый", "Бесстрашный", 
+            "Справедливый", "Щедрый"
+        ];
+
+        const funnyNicknamesData = [
+            "Пятка Дракона", "Кривой Меч", "Вечно Голодный", "Три Кружки Эля", "Спаситель Коз", "Гроза Огородов", 
+            "Победитель Плесени", "Ночной Храп", "Босой Завоеватель", "Друг Всех Собак", "Пожиратель Пирогов", 
+            "Кривоногий Странник", "Лорд Пятничных Пьянок", "Неудачливый Вор", "Мастер Потерянных Ключей", 
+            "Ходячая Неприятность", "Герой Одного Дня", "Великий Путаник", "Разрушитель Табуреток", 
+            "Укротитель Комаров", "Блюститель Чистых Носков", "Победитель Похмелья", "Ловкач на Словах", 
+            "Трус с Большим Мечом", "Коллекционер Синяков", "Победитель Дверных Ручк", "Сэр Осторожно Ступенька", 
+            "Защитник Пустых Карманов", "Гроза Бутербродов", "Пламенный Оратор по Утрам", "Бегун от Ответственности", 
+            "Князь Беспорядка", "Меткий Только в Молоко", "Двухлевый", "Одноглазый Оптимист", 
+            "Трижды Упавший с Лошади", "Носитель Мокрых Сапог", "Победитель Своих Страхов (Почти)", 
+            "Любимец Трактирщиков", "Гроза Подушек", "Великий Комбинатор Объедков", "Хранитель Чужого Золота", 
+            "Рыцарь Пластикового Доспеха", "Укротитель Тапок", "Победитель Комариного Роя", 
+            "Мастер Неловких Падений", "Сэр Вечно Опоздавший", "Барон Прокисшего Молока", "Герой Без Подвига"
+        ];
+
+        // Массивы для хранения текущих результатов на экране
+        let currentNicknames = [];
+        let currentFunnyNicknames = [];
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Обработчик для обычных прозвищ
+        document.getElementById('btn-nicknames').onclick = () => {
+            currentNicknames.push(getRandomItem(nicknamesData));
+            if (currentNicknames.length > 5) currentNicknames.shift(); // Оставляем только 5
+            
+            const output = document.getElementById('output-nicknames');
+            output.textContent = currentNicknames.join(', ');
+            output.style.color = '#e8e0d0'; // Меняем цвет, когда появляется текст
+        };
+
+        // Обработчик для смешных прозвищ
+        document.getElementById('btn-funny-nicknames').onclick = () => {
+            currentFunnyNicknames.push(getRandomItem(funnyNicknamesData));
+            if (currentFunnyNicknames.length > 5) currentFunnyNicknames.shift(); // Оставляем только 5
+            
+            const output = document.getElementById('output-funny-nicknames');
+            output.textContent = currentFunnyNicknames.join(', ');
+            output.style.color = '#e8e0d0'; 
+        };
     </script>
 </body>
 </html>
