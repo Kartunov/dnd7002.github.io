@@ -54,8 +54,8 @@
             font-size: 1.1em;
         }
 
-        /* Контейнер для генератора */
-        .generator-container {
+        /* Контейнеры */
+        .generator-container, .special-room-container {
             background-color: rgba(27, 40, 56, 0.8);
             border: 1px solid #333;
             border-left: 5px solid #2c5a8c;
@@ -65,7 +65,20 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 800px; /* Увеличили ширину, чтобы поместился счетчик */
+            max-width: 800px; 
+            margin-bottom: 30px;
+        }
+
+        .special-room-container {
+            border-left: 5px solid #a83232; /* Красная полоса для выделения */
+        }
+
+        .special-room-container h2 {
+            font-family: 'Cinzel', serif;
+            color: #e8b84b;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         .btn-generate {
@@ -88,9 +101,18 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(74, 144, 226, 0.4);
         }
-
+        
         .btn-generate:active {
             transform: translateY(0);
+        }
+
+        .btn-special {
+            background-color: #a83232;
+            color: white;
+        }
+        .btn-special:hover {
+            background-color: #d64545;
+            box-shadow: 0 6px 12px rgba(168, 50, 50, 0.4);
         }
 
         /* Обертка для сетки и счетчика */
@@ -102,7 +124,6 @@
             width: 100%;
             margin-top: 10px;
         }
-        
         .dungeon-wrapper.active {
             display: flex;
         }
@@ -114,7 +135,7 @@
             }
         }
 
-        /* Сетка 15x15 */
+        /* Сетка */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(15, 30px);
@@ -145,7 +166,7 @@
             box-shadow: inset 0 0 5px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Панель счетчика */
+        /* Счетчик */
         .counter-panel {
             display: flex;
             flex-direction: column;
@@ -157,7 +178,6 @@
             min-width: 120px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         }
-
         .counter-title {
             font-family: 'Cinzel', serif;
             color: #4a90e2;
@@ -165,9 +185,7 @@
             text-align: center;
             margin-bottom: 15px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
-
         .counter-display {
             font-size: 3em;
             font-weight: bold;
@@ -176,12 +194,10 @@
             margin-bottom: 15px;
             font-family: 'Cinzel', serif;
         }
-
         .counter-buttons {
             display: flex;
             gap: 15px;
         }
-
         .btn-counter {
             background-color: #2c5a8c;
             color: white;
@@ -196,14 +212,8 @@
             align-items: center;
             transition: background-color 0.2s, transform 0.1s;
         }
-
-        .btn-counter:hover {
-            background-color: #4a90e2;
-        }
-
-        .btn-counter:active {
-            transform: scale(0.95);
-        }
+        .btn-counter:hover { background-color: #4a90e2; }
+        .btn-counter:active { transform: scale(0.95); }
 
         /* Легенда */
         .legend {
@@ -217,24 +227,17 @@
             box-sizing: border-box;
             font-size: 0.95em;
         }
-        .legend.active {
-            display: block;
-        }
+        .legend.active { display: block; }
         .legend-item {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 8px;
         }
-        .legend-item:last-child {
-            margin-bottom: 0;
-        }
-        .legend-icon {
-            font-size: 1.4em;
-            width: 30px;
-            text-align: center;
-        }
+        .legend-item:last-child { margin-bottom: 0; }
+        .legend-icon { font-size: 1.4em; width: 30px; text-align: center; }
 
+        /* Подсказки */
         .info-text {
             margin-top: 15px;
             font-size: 0.9em;
@@ -242,16 +245,54 @@
             text-align: center;
             min-height: 20px;
         }
+
+        /* Блок результата особой комнаты */
+        .special-result-box {
+            display: none;
+            margin-top: 20px;
+            width: 100%;
+            background-color: rgba(15, 23, 34, 0.9);
+            border: 1px solid #a83232;
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            animation: fadeIn 0.4s ease-out;
+        }
+        .special-result-box.active {
+            display: block;
+        }
+        .special-title {
+            font-family: 'Cinzel', serif;
+            color: #e8b84b;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+        .special-detail {
+            font-size: 1.1em;
+            color: #c9d6e8;
+            margin-bottom: 5px;
+        }
+        .special-detail span {
+            color: #7ab5f5; /* Синий акцент для деталей */
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <h1>🎲 Первый уровень</h1>
     <a href="kadgar.html" class="nav-link">← Назад в Инструменты Кадгара</a>
 
+    <!-- ГЕНЕРАТОР ЭТАЖА -->
     <div class="generator-container">
         <button class="btn-generate" id="generate-btn">Создать этаж</button>
         
-        <!-- Обертка для сетки и счетчика -->
         <div class="dungeon-wrapper" id="dungeon-wrapper">
             <div class="grid-container" id="grid"></div>
             
@@ -276,50 +317,48 @@
         <div class="info-text" id="info"></div>
     </div>
 
-    <script>
-        const GRID_SIZE = 15;
+    <!-- ГЕНЕРАТОР ОСОБЫХ КОМНАТ -->
+    <div class="special-room-container">
+        <h2>🎲 Генератор особых комнат</h2>
+        <button class="btn-generate btn-special" id="generate-special-btn">Создать комнату</button>
         
+        <div class="special-result-box" id="special-result">
+            <div class="special-title" id="special-room-name">Название комнаты</div>
+            <div id="special-room-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ГЕНЕРАТОР ЭТАЖА (без изменений)
+        // ==========================================
+        const GRID_SIZE = 15;
         const gridContainer = document.getElementById('grid');
         const generateBtn = document.getElementById('generate-btn');
         const infoText = document.getElementById('info');
         const legend = document.getElementById('legend');
         const dungeonWrapper = document.getElementById('dungeon-wrapper');
-        
-        // Элементы счетчика
         const floorCountDisplay = document.getElementById('floor-count');
         const btnPlus = document.getElementById('btn-plus');
         const btnMinus = document.getElementById('btn-minus');
         
-        let currentFloor = 1; // Начальное значение
+        let currentFloor = 1;
 
-        // Логика счетчика
-        btnPlus.addEventListener('click', () => {
-            currentFloor++;
-            floorCountDisplay.textContent = currentFloor;
-        });
-
-        btnMinus.addEventListener('click', () => {
-            if (currentFloor > 1) { // Не даем уйти ниже 1 этажа
-                currentFloor--;
-                floorCountDisplay.textContent = currentFloor;
-            }
-        });
+        btnPlus.addEventListener('click', () => { currentFloor++; floorCountDisplay.textContent = currentFloor; });
+        btnMinus.addEventListener('click', () => { if (currentFloor > 1) { currentFloor--; floorCountDisplay.textContent = currentFloor; } });
 
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
-
-        function isValid(x, y) {
-            return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
         }
-
+        function isValid(x, y) { return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE; }
         function countNeighbors(x, y, roomsSet) {
             let count = 0;
             const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
             for (let [dx, dy] of dirs) {
-                if (roomsSet.has(`${x + dx},${y + dy}`)) {
-                    count++;
-                }
+                if (roomsSet.has(`${x + dx},${y + dy}`)) count++;
             }
             return count;
         }
@@ -327,7 +366,6 @@
         function generateDungeon() {
             gridContainer.innerHTML = '';
             const roomsSet = new Set();
-            
             const startX = Math.floor(GRID_SIZE / 2);
             const startY = Math.floor(GRID_SIZE / 2);
             roomsSet.add(`${startX},${startY}`);
@@ -335,64 +373,40 @@
             let added = 1;
             while (added < 3) {
                 const roomsArray = Array.from(roomsSet);
-                const randomRoom = roomsArray[getRandomInt(0, roomsArray.length - 1)];
+                const randomRoom = getRandomItem(roomsArray);
                 const [cx, cy] = randomRoom.split(',').map(Number);
-                const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
-                const [dx, dy] = dirs[getRandomInt(0, 3)];
-                const nx = cx + dx;
-                const ny = cy + dy;
-                const key = `${nx},${ny}`;
-                
+                const [dx, dy] = getRandomItem([[0, -1], [0, 1], [-1, 0], [1, 0]]);
+                const nx = cx + dx; const ny = cy + dy; const key = `${nx},${ny}`;
                 if (isValid(nx, ny) && !roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 1) {
-                    roomsSet.add(key);
-                    added++;
+                    roomsSet.add(key); added++;
                 }
             }
 
             const extraRooms = getRandomInt(1, 6);
-            let attempts = 0;
-            let extraAdded = 0;
-
+            let attempts = 0; let extraAdded = 0;
             while (extraAdded < extraRooms && attempts < 500) {
                 attempts++;
-                const roomsArray = Array.from(roomsSet);
-                const randomRoom = roomsArray[getRandomInt(0, roomsArray.length - 1)];
+                const randomRoom = getRandomItem(Array.from(roomsSet));
                 const [cx, cy] = randomRoom.split(',').map(Number);
-                const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
-                const [dx, dy] = dirs[getRandomInt(0, 3)];
-                const nx = cx + dx;
-                const ny = cy + dy;
-                const key = `${nx},${ny}`;
-                
+                const [dx, dy] = getRandomItem([[0, -1], [0, 1], [-1, 0], [1, 0]]);
+                const nx = cx + dx; const ny = cy + dy; const key = `${nx},${ny}`;
                 if (isValid(nx, ny) && !roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 2) {
-                    roomsSet.add(key);
-                    extraAdded++;
+                    roomsSet.add(key); extraAdded++;
                 }
             }
 
             const queue = [{ x: startX, y: startY, dist: 0 }];
-            const visited = new Set();
-            visited.add(`${startX},${startY}`);
-            
+            const visited = new Set([`${startX},${startY}`]);
             let farthestRoom = { x: startX, y: startY };
             let maxDistance = -1;
 
             while (queue.length > 0) {
                 const current = queue.shift();
-                if (current.dist > maxDistance) {
-                    maxDistance = current.dist;
-                    farthestRoom = { x: current.x, y: current.y };
-                }
-
-                const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
-                for (let [dx, dy] of dirs) {
-                    const nx = current.x + dx;
-                    const ny = current.y + dy;
-                    const key = `${nx},${ny}`;
-                    
+                if (current.dist > maxDistance) { maxDistance = current.dist; farthestRoom = { x: current.x, y: current.y }; }
+                for (let [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+                    const nx = current.x + dx; const ny = current.y + dy; const key = `${nx},${ny}`;
                     if (roomsSet.has(key) && !visited.has(key)) {
-                        visited.add(key);
-                        queue.push({ x: nx, y: ny, dist: current.dist + 1 });
+                        visited.add(key); queue.push({ x: nx, y: ny, dist: current.dist + 1 });
                     }
                 }
             }
@@ -400,15 +414,12 @@
             const availableRooms = [];
             roomsSet.forEach(key => {
                 const [x, y] = key.split(',').map(Number);
-                const isStart = (x === startX && y === startY);
-                const isBoss = (x === farthestRoom.x && y === farthestRoom.y);
-                if (!isStart && !isBoss) {
+                if (!(x === startX && y === startY) && !(x === farthestRoom.x && y === farthestRoom.y)) {
                     availableRooms.push({ x, y });
                 }
             });
 
-            let eventRoom = null;
-            let eventIcon = '';
+            let eventRoom = null; let eventIcon = '';
             if (availableRooms.length > 0) {
                 const randomIndex = getRandomInt(0, availableRooms.length - 1);
                 eventRoom = availableRooms[randomIndex];
@@ -417,33 +428,19 @@
             }
 
             let specialRoom = null;
-            if (availableRooms.length >= 3) {
-                const randomIndex = getRandomInt(0, availableRooms.length - 1);
-                specialRoom = availableRooms[randomIndex];
-            }
+            if (availableRooms.length >= 3) specialRoom = getRandomItem(availableRooms);
 
             for (let y = 0; y < GRID_SIZE; y++) {
                 for (let x = 0; x < GRID_SIZE; x++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell';
-                    
                     if (roomsSet.has(`${x},${y}`)) {
                         cell.classList.add('room');
-                        
-                        if (x === startX && y === startY) {
-                            cell.textContent = '🚩';
-                        }
-                        else if (x === farthestRoom.x && y === farthestRoom.y) {
-                            cell.textContent = '💀'; 
-                        }
-                        else if (eventRoom && x === eventRoom.x && y === eventRoom.y) {
-                            cell.textContent = eventIcon;
-                        }
-                        else if (specialRoom && x === specialRoom.x && y === specialRoom.y) {
-                            cell.textContent = '❓';
-                        }
+                        if (x === startX && y === startY) cell.textContent = '🚩';
+                        else if (x === farthestRoom.x && y === farthestRoom.y) cell.textContent = '💀'; 
+                        else if (eventRoom && x === eventRoom.x && y === eventRoom.y) cell.textContent = eventIcon;
+                        else if (specialRoom && x === specialRoom.x && y === specialRoom.y) cell.textContent = '❓';
                     }
-                    
                     gridContainer.appendChild(cell);
                 }
             }
@@ -454,6 +451,111 @@
         }
 
         generateBtn.addEventListener('click', generateDungeon);
+
+
+        // ==========================================
+        // ГЕНЕРАТОР ОСОБЫХ КОМНАТ
+        // ==========================================
+        
+        const specialBtn = document.getElementById('generate-special-btn');
+        const specialResultBox = document.getElementById('special-result');
+        const specialRoomName = document.getElementById('special-room-name');
+        const specialRoomContent = document.getElementById('special-room-content');
+
+        function generateSpecialRoom() {
+            // 1. Выбираем тип комнаты
+            const roomTypes = ["Торговец", "Квестодатель", "Сокровищница", "Комната Удачи", "Жертвенная комната", "Комната испытаний"];
+            const roomType = getRandomItem(roomTypes);
+            
+            let contentHtml = '';
+
+            // 2. Логика для каждого типа
+            switch(roomType) {
+                case "Торговец":
+                    const traderType = getRandomItem(["Оружия и посохи", "Доспехи и щиты", "Свитки и расходники", "Мощные артефакты", "Обменник безделушек"]);
+                    contentHtml = `<div class="special-detail">Ассортимент: <span>${traderType}</span></div>`;
+                    break;
+
+                case "Квестодатель":
+                    const questType = getRandomItem(["Убийство", "Сбор", "Доставка", "Сопровождение"]);
+                    contentHtml = `<div class="special-detail">Тип задания: <span>${questType}</span></div>`;
+                    break;
+
+                case "Сокровищница":
+                    const treasureType = getRandomItem(["Ближнее оружие", "Дальнее оружие", "Магическое", "Доспех", "Артефакт"]);
+                    contentHtml = `<div class="special-detail">Содержимое: <span>${treasureType}</span></div>`;
+                    break;
+
+                case "Комната Удачи":
+                    const luckEffect = getRandomItem([
+                        "Оружие получает преимущество на первые две атаки", 
+                        "Увеличена скорость перемещения на 10 фт", 
+                        "В конце каждого хода лечит на к4+БМ", 
+                        "С шансом в 33% можно не потратить ячейку заклинания", 
+                        "Ваш урон увеличен на ваш БМ", 
+                        "Даёт эффект везунчика на один раз", 
+                        "Оружие получает помеху на первые две атаки", 
+                        "Уменьшена скорость перемещения на 10 фт", 
+                        "В конце каждого хода наносит урон на к4+БМ", 
+                        "С шансом в 33% можно потратить лишнюю ячейку заклинаний", 
+                        "Ваш урон уменьшен на ваш БМ", 
+                        "Даёт эффект везунчика против вас на один раз"
+                    ]);
+                    contentHtml = `<div class="special-detail">Эффект: <span>${luckEffect}</span></div>`;
+                    break;
+
+                case "Жертвенная комната":
+                    const sacrifice = getRandomItem([
+                        "Пожертвовать одной костью максимального здоровья на этаж (66% шанс на награду)",
+                        "Пожертвовать возможностью делать короткий отдых (100% шанс на награду, одноразово)",
+                        "Пожертвовать рационом (15% шанс на награду)",
+                        "Пожертвовать предметом (доспех/оружие/артефакт) (33% шанс на награду)",
+                        "Пожертвовать ячейку заклинаний на этаж (66% шанс на награду)",
+                        "Пожертвовать 5 фт максимальной скорости на этаж (66% шанс на награду)"
+                    ]);
+                    const reward = getRandomItem([
+                        "Развеивает эффект 1 мутатора (см дополнительные правила)",
+                        "Дарует какой-либо магический артефакт",
+                        "Дарует какой-либо доспех",
+                        "Дарует какое-либо оружие",
+                        "Дарует какой-либо из баффов от фонтана до конца этажа",
+                        "Дарует знание какие типы комнат находятся рядом",
+                        "Даёт эффект длительного отдыха",
+                        "Даёт эффект какого-либо дебафа от фонтана до конца этажа"
+                    ]);
+                    contentHtml = `
+                        <div class="special-detail">Требование: <span>${sacrifice}</span></div>
+                        <div class="special-detail" style="margin-top: 10px;">Награда: <span>${reward}</span></div>
+                    `;
+                    break;
+
+                case "Комната испытаний":
+                    const trial = getRandomItem([
+                        "Пройти комнату без использование рывков",
+                        "Пройти комнату без бонусных действий",
+                        "Пройти комнату без бонусных умений",
+                        "Пройти комнату без реакций",
+                        "Пройти комнату не получив урона",
+                        "Пройти комнату не используя заклинаний",
+                        "Пройти комнату не больше чем за 4 раунда",
+                        "Пройти комнату не используя вообще ничего"
+                    ]);
+                    contentHtml = `<div class="special-detail">Испытание: <span>${trial}</span></div>`;
+                    break;
+            }
+
+            // 3. Обновляем интерфейс
+            specialRoomName.textContent = roomType;
+            specialRoomContent.innerHTML = contentHtml;
+            
+            // Показываем результат
+            specialResultBox.classList.remove('active');
+            // Небольшая задержка для перезапуска анимации
+            void specialResultBox.offsetWidth; 
+            specialResultBox.classList.add('active');
+        }
+
+        specialBtn.addEventListener('click', generateSpecialRoom);
     </script>
 </body>
 </html>
