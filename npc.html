@@ -6,35 +6,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Генератор имён — D&D</title>
     <style>
+        /* Подключаем шрифт для заголовков */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
+
         body {
             font-family: Georgia, serif;
+            /* Фон с текстурой */
             background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #e8e0d0;
-            max-width: 1200px; /* Шире, чтобы помещалось 4 колонки */
+            max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
+            box-sizing: border-box;
         }
+
         h1 {
+            font-family: 'Cinzel', serif;
             color: #c9a227;
             border-bottom: 2px solid #c9a227;
             padding-bottom: 10px;
             text-align: center;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-top: 0;
         }
+
         a {
             color: #e8b84b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover {
+            color: #fff;
         }
 
         .header-nav {
             text-align: center;
             margin-bottom: 30px;
+            font-style: italic;
         }
 
         /* Сетка для рас (4 в ряд) */
         .races-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 20px;
+            margin-bottom: 40px;
         }
         @media (max-width: 1000px) {
             .races-grid { grid-template-columns: repeat(2, 1fr); }
@@ -45,24 +64,33 @@
 
         /* Стили для таблички-карточки расы */
         .race-card {
-            background-color: #2a2a2a;
+            background-color: rgba(42, 42, 42, 0.95);
             border: 1px solid #444;
-            border-radius: 4px;
+            border-radius: 6px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .race-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
         }
 
         /* Заголовок с названием расы (некликабельный) */
         .race-title {
             background-color: #333;
             color: #c9a227;
+            font-family: 'Cinzel', serif;
             font-weight: bold;
             text-align: center;
-            padding: 10px;
+            padding: 12px 10px;
             border-bottom: 1px solid #444;
             text-transform: uppercase;
             font-size: 1.1em;
+            letter-spacing: 1px;
         }
 
         /* Кнопки Мужское / Женское */
@@ -75,11 +103,11 @@
             background-color: #222;
             color: #e8e0d0;
             border: none;
-            padding: 10px;
+            padding: 12px;
             cursor: pointer;
             font-family: inherit;
             font-size: 1em;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             border-right: 1px solid #444;
         }
         .gender-btn:last-child {
@@ -87,6 +115,7 @@
         }
         .gender-btn:hover {
             background-color: #444;
+            color: #c9a227;
         }
         .gender-btn:active {
             background-color: #c9a227;
@@ -98,10 +127,58 @@
             padding: 15px 10px;
             text-align: center;
             font-size: 0.95em;
-            min-height: 60px;
+            min-height: 70px; /* Чуть больше высота, чтобы не прыгало */
             word-wrap: break-word;
             color: #e8b84b;
             background-color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ТАБЛИЦА ПРОЗВИЩ */
+        .nicknames-card {
+            margin-top: 40px;
+            background-color: rgba(42, 42, 42, 0.95);
+            border: 1px solid #444;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        .nicknames-row {
+            display: flex;
+            border-bottom: 1px solid #444;
+        }
+        .nicknames-row:last-child {
+            border-bottom: none;
+        }
+        
+        .nickname-btn {
+            flex: 1;
+            background-color: #333;
+            color: #c9a227;
+            border: none;
+            border-right: 1px solid #444;
+            padding: 15px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1em;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.2s;
+        }
+        .nickname-btn:hover {
+            background-color: #444;
+        }
+        
+        .nickname-output {
+            flex: 2;
+            padding: 15px;
+            background-color: #1a1a1a;
+            color: #e8e0d0;
+            display: flex;
+            align-items: center;
+            font-size: 1em;
         }
     </style>
 </head>
@@ -114,19 +191,19 @@
     <div class="races-grid" id="races-grid">
         <!-- Сюда будут вставляться таблички рас -->
     </div>
-        <!-- ТАБЛИЦА ПРОЗВИЩ -->
-    <div class="nicknames-card" style="margin-top: 40px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 4px; overflow: hidden;">
-        
+
+    <!-- ТАБЛИЦА ПРОЗВИЩ -->
+    <div class="nicknames-card">
         <!-- Строка 1: Прозвища -->
-        <div style="display: flex; border-bottom: 1px solid #444;">
-            <button id="btn-nicknames" style="flex: 1; background-color: #333; color: #c9a227; border: none; border-right: 1px solid #444; padding: 15px; font-family: inherit; font-size: 1.1em; cursor: pointer; text-align: left;">Прозвища</button>
-            <div id="output-nicknames" style="flex: 2; padding: 15px; background-color: #1a1a1a; color: #e8b84b; display: flex; align-items: center; font-size: 0.95em;">—</div>
+        <div class="nicknames-row">
+            <button id="btn-nicknames" class="nickname-btn">Прозвища</button>
+            <div id="output-nicknames" class="nickname-output">—</div>
         </div>
 
         <!-- Строка 2: Смешные прозвища -->
-        <div style="display: flex;">
-            <button id="btn-funny-nicknames" style="flex: 1; background-color: #333; color: #c9a227; border: none; border-right: 1px solid #444; padding: 15px; font-family: inherit; font-size: 1.1em; cursor: pointer; text-align: left;">Смешные прозвища</button>
-            <div id="output-funny-nicknames" style="flex: 2; padding: 15px; background-color: #1a1a1a; color: #e8b84b; display: flex; align-items: center; font-size: 0.95em;">—</div>
+        <div class="nicknames-row">
+            <button id="btn-funny-nicknames" class="nickname-btn">Смешные прозвища</button>
+            <div id="output-funny-nicknames" class="nickname-output">—</div>
         </div>
     </div>
 
@@ -134,9 +211,7 @@
         // ==========================================
         // БАЗЫ ДАННЫХ ИМЁН
         // ==========================================
-        
-        // Пока тут только люди, остальные добавим по мере необходимости
-                   const databases = {
+        const databases = {
             "Люди": {
                 male: [
                     "Блас", "Бран", "Гет", "Ландер", "Лют", "Максер", "Стор", "Таман", "Урт", "Фрат", "Эндер", 
@@ -285,35 +360,28 @@
         };
 
         // ==========================================
-        // ЛОГИКА ГЕНЕРАЦИИ
+        // ЛОГИКА ГЕНЕРАЦИИ ИМЁН
         // ==========================================
 
         const racesGrid = document.getElementById('races-grid');
 
-        // Функция для выбора случайного элемента из массива
         function getRandomElement(arr) {
             if (!arr || arr.length === 0) return "";
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        // Функция для отрисовки всех рас
         function renderRaces() {
-            racesGrid.innerHTML = ''; // Очищаем сетку
+            racesGrid.innerHTML = ''; 
 
-            // Перебираем все расы из базы данных
             for (const [raceName, data] of Object.entries(databases)) {
-                
-                // Создаем контейнер для одной расы
                 const raceCard = document.createElement('div');
                 raceCard.className = 'race-card';
 
-                // 1. Заголовок расы (некликабельный)
                 const title = document.createElement('div');
                 title.className = 'race-title';
                 title.textContent = raceName;
                 raceCard.appendChild(title);
 
-                // 2. Блок с кнопками
                 const btnContainer = document.createElement('div');
                 btnContainer.className = 'gender-buttons';
 
@@ -329,55 +397,41 @@
                 btnContainer.appendChild(femaleBtn);
                 raceCard.appendChild(btnContainer);
 
-                // 3. Поле для вывода
                 const outputDiv = document.createElement('div');
                 outputDiv.className = 'name-output';
                 raceCard.appendChild(outputDiv);
 
-                // Храним имена для этой конкретной таблицы в массивах
                 let currentMaleNames = [];
                 let currentFemaleNames = [];
 
-                // Вспомогательная функция для обновления текста в поле вывода
                 function updateOutput() {
-                    // Собираем все имена, разделяя их запятой
                     let allNames = [];
                     if (currentMaleNames.length > 0) allNames.push(currentMaleNames.join(', '));
                     if (currentFemaleNames.length > 0) allNames.push(currentFemaleNames.join(', '));
-                    
-                    outputDiv.textContent = allNames.join(' | '); // Разделяем мужские и женские вертикальной чертой
+                    outputDiv.textContent = allNames.join(' | '); 
                 }
 
-                // Логика для кнопки "Мужское"
                 maleBtn.onclick = () => {
                     const newName = getRandomElement(data.male);
                     currentMaleNames.push(newName);
-                    // Оставляем только 3 последних имени
-                    if (currentMaleNames.length > 3) {
-                        currentMaleNames.shift(); 
-                    }
+                    if (currentMaleNames.length > 3) currentMaleNames.shift(); 
                     updateOutput();
                 };
 
-                // Логика для кнопки "Женское"
                 femaleBtn.onclick = () => {
                     const newName = getRandomElement(data.female);
                     currentFemaleNames.push(newName);
-                    // Оставляем только 3 последних имени
-                    if (currentFemaleNames.length > 3) {
-                        currentFemaleNames.shift(); 
-                    }
+                    if (currentFemaleNames.length > 3) currentFemaleNames.shift(); 
                     updateOutput();
                 };
 
-                // Добавляем готовую карточку в сетку
                 racesGrid.appendChild(raceCard);
             }
         }
 
-        // Запускаем отрисовку при загрузке
         renderRaces();
-            // ==========================================
+
+        // ==========================================
         // ПРОЗВИЩА
         // ==========================================
 
@@ -406,7 +460,6 @@
             "Мастер Неловких Падений", "Сэр Вечно Опоздавший", "Барон Прокисшего Молока", "Герой Без Подвига"
         ];
 
-        // Массивы для хранения текущих результатов на экране
         let currentNicknames = [];
         let currentFunnyNicknames = [];
 
@@ -414,24 +467,20 @@
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        // Обработчик для обычных прозвищ
         document.getElementById('btn-nicknames').onclick = () => {
             currentNicknames.push(getRandomItem(nicknamesData));
-            if (currentNicknames.length > 5) currentNicknames.shift(); // Оставляем только 5
+            if (currentNicknames.length > 5) currentNicknames.shift(); 
             
             const output = document.getElementById('output-nicknames');
             output.textContent = currentNicknames.join(', ');
-            output.style.color = '#e8e0d0'; // Меняем цвет, когда появляется текст
         };
 
-        // Обработчик для смешных прозвищ
         document.getElementById('btn-funny-nicknames').onclick = () => {
             currentFunnyNicknames.push(getRandomItem(funnyNicknamesData));
-            if (currentFunnyNicknames.length > 5) currentFunnyNicknames.shift(); // Оставляем только 5
+            if (currentFunnyNicknames.length > 5) currentFunnyNicknames.shift(); 
             
             const output = document.getElementById('output-funny-nicknames');
             output.textContent = currentFunnyNicknames.join(', ');
-            output.style.color = '#e8e0d0'; 
         };
     </script>
 </body>
