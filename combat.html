@@ -1,58 +1,92 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Боевой трекер — D&D</title>
-    <link rel="icon" type="image/png" href="favicon.png"> <!-- Твоя иконка -->
     <style>
+        /* Подключаем шрифт для заголовков */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
+
         body {
             font-family: Georgia, serif;
+            /* Фон с текстурой */
             background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #e8e0d0;
             max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
+            box-sizing: border-box;
         }
-        h1, h2 { color: #c9a227; border-bottom: 2px solid #c9a227; padding-bottom: 10px; text-align: center; }
-        a { color: #e8b84b; }
-        
-        .controls {
-            background-color: #2a2a2a;
-            padding: 20px;
-            border-radius: 8px;
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: #c9a227;
+            border-bottom: 2px solid #c9a227;
+            padding-bottom: 10px;
+            text-align: center;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-top: 0;
+        }
+
+        a {
+            color: #e8b84b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover { color: #fff; }
+
+        .header-nav {
+            text-align: center;
             margin-bottom: 30px;
-            border-left: 4px solid #c9a227;
+            font-style: italic;
+        }
+
+        /* Форма добавления */
+        .controls {
+            background-color: rgba(42, 42, 42, 0.95);
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            border: 1px solid #444;
+            border-left: 5px solid #c9a227;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         }
+        
         input[type="text"], input[type="number"] {
             background-color: #1a1a1a;
             color: #e8e0d0;
-            border: 1px solid #444;
+            border: 1px solid #555;
             padding: 10px;
             border-radius: 4px;
             font-family: inherit;
             font-size: 1em;
+            transition: border-color 0.2s;
         }
+        input:focus { outline: none; border-color: #c9a227; }
+
         .btn {
             background-color: #c9a227;
             color: #1a1a1a;
             border: none;
             padding: 10px 20px;
             font-size: 1em;
-            font-family: inherit;
+            font-family: 'Cinzel', serif;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
         .btn:hover { background-color: #e8b84b; }
-        .btn-small { padding: 5px 10px; font-size: 0.9em; }
+        .btn-small { padding: 5px 10px; font-size: 0.9em; font-family: Georgia, serif; }
         .btn-danger { background-color: #a83232; color: white; }
         .btn-danger:hover { background-color: #d64545; }
         .btn-green { background-color: #2e7d32; color: white; }
@@ -62,11 +96,14 @@
         .tracker-table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #1a1a1a;
+            background-color: rgba(42, 42, 42, 0.95);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
         }
         .tracker-table th, .tracker-table td {
             border: 1px solid #444;
-            padding: 10px;
+            padding: 12px 15px;
             text-align: left;
             vertical-align: top;
         }
@@ -74,21 +111,35 @@
             background-color: #333;
             color: #c9a227;
             text-align: center;
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #c9a227;
         }
         
+        tbody tr:nth-child(even) {
+            background-color: rgba(26, 26, 26, 0.3);
+        }
+        tbody tr:hover {
+            background-color: rgba(51, 51, 51, 0.5);
+        }
+
         /* Стили для ХП */
         .hp-bar {
             width: 100%;
-            height: 10px;
-            background-color: #444;
-            border-radius: 5px;
+            height: 12px;
+            background-color: #333;
+            border-radius: 6px;
             margin-top: 5px;
             overflow: hidden;
+            border: 1px solid #222;
         }
         .hp-fill {
             height: 100%;
             background-color: #a83232;
             transition: width 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
         }
 
         /* Блок состояний */
@@ -99,14 +150,14 @@
             margin-top: 5px;
         }
         .condition-item {
-            background-color: #2a2a2a;
-            padding: 5px 10px;
+            background-color: rgba(51, 51, 51, 0.8);
+            padding: 6px 10px;
             border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.9em;
-            border-left: 2px solid #c9a227;
+            border-left: 3px solid #c9a227;
         }
         
         .add-cond-form {
@@ -116,8 +167,9 @@
         }
         .add-cond-form input {
             flex-grow: 1;
-            padding: 5px;
+            padding: 6px;
             font-size: 0.9em;
+            min-width: 0;
         }
         
         .concentration-badge {
@@ -130,11 +182,21 @@
             font-weight: bold;
             margin-top: 5px;
         }
+        
+        /* Кастомный чекбокс */
+        input[type="checkbox"] {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            accent-color: #c9a227;
+        }
     </style>
 </head>
 <body>
     <h1>⚔️ Боевой трекер</h1>
-    <p style="text-align: center;"><a href="index.html">← Назад на главную</a></p>
+    <div class="header-nav">
+        <a href="index.html">← Назад на главную</a>
+    </div>
 
     <!-- Форма добавления -->
     <div class="controls">
@@ -149,12 +211,12 @@
     <table class="tracker-table">
         <thead>
             <tr>
-                <th style="width: 50px;">Иниц.</th>
+                <th style="width: 60px;">Иниц.</th>
                 <th style="width: 200px;">Имя</th>
                 <th>ХП / КД</th>
                 <th>Состояния</th>
                 <th style="width: 100px;">Концентрация</th>
-                <th style="width: 50px;">Удалить</th>
+                <th style="width: 60px;">Удалить</th>
             </tr>
         </thead>
         <tbody id="tracker-body">
@@ -198,16 +260,16 @@
                 const hpPercent = Math.max(0, Math.min(100, (c.hp / c.maxHp) * 100));
 
                 tr.innerHTML = `
-                    <td style="text-align: center; font-size: 1.2em; color: #e8b84b;">${c.init}</td>
+                    <td style="text-align: center; font-size: 1.2em; color: #e8b84b; font-weight: bold;">${c.init}</td>
                     <td><b>${c.name}</b></td>
                     <td>
                         <div style="display: flex; gap: 5px; align-items: center;">
-                            <input type="number" value="${c.hp}" onchange="updateHP('${c.id}', this.value)" style="width: 60px;"> 
-                            / ${c.maxHp} ХП
+                            <input type="number" value="${c.hp}" onchange="updateHP('${c.id}', this.value)" style="width: 60px; padding: 4px; text-align: center;"> 
+                            <span style="color: #888;">/ ${c.maxHp} ХП</span>
                         </div>
                         <div class="hp-bar"><div class="hp-fill" style="width: ${hpPercent}%"></div></div>
-                        <div style="margin-top: 5px; font-size: 0.9em;">КД: <b>${c.ac}</b></div>
-                        <div style="margin-top: 5px; display: flex; gap: 5px;">
+                        <div style="margin-top: 8px; font-size: 0.9em;">КД: <b style="color: #e8b84b;">${c.ac}</b></div>
+                        <div style="margin-top: 8px; display: flex; gap: 5px; flex-wrap: wrap;">
                             <button class="btn btn-small btn-danger" onclick="changeHP('${c.id}', -5)">-5</button>
                             <button class="btn btn-small btn-danger" onclick="changeHP('${c.id}', -1)">-1</button>
                             <button class="btn btn-small btn-green" onclick="changeHP('${c.id}', 1)">+1</button>
@@ -223,7 +285,7 @@
                         </div>
                     </td>
                     <td style="text-align: center;">
-                        <input type="checkbox" ${c.concentration ? 'checked' : ''} onchange="toggleConcentration('${c.id}', this.checked)" style="transform: scale(1.5); cursor: pointer;">
+                        <input type="checkbox" ${c.concentration ? 'checked' : ''} onchange="toggleConcentration('${c.id}', this.checked)">
                     </td>
                     <td style="text-align: center;">
                         <button class="btn btn-small btn-danger" onclick="removeCombatant('${c.id}')">✖</button>
