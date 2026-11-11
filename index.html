@@ -67,6 +67,79 @@
                 grid-template-columns: 1fr;
             }
         }
+                /* Обертка для сетки и вертикальной карточки */
+        .layout-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: stretch; /* Растягиваем по высоте */
+        }
+
+        /* Сетка карточек (занимает всё доступное место) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            flex: 1; /* Занимает всё оставшееся место */
+        }
+
+        /* Синяя карточка */
+        .card-blue {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: rgba(27, 40, 56, 0.95); /* Тёмно-синий */
+            border: 1px solid #444;
+            border-left: 5px solid #4a90e2; /* Синяя полоса */
+            padding: 25px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #e8e0d0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            width: 200px; /* Фиксированная ширина для вертикальности */
+            text-align: center;
+        }
+
+        .card-blue:hover {
+            background-color: rgba(34, 50, 70, 1);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(74, 144, 226, 0.3);
+            border-color: #4a90e2;
+        }
+
+        .card-blue h2 {
+            color: #4a90e2;
+            margin-top: 0;
+            font-size: 1.4em;
+            border-bottom: 1px solid #4a90e2;
+            padding-bottom: 10px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .card-blue p {
+            margin-bottom: 0;
+            font-size: 0.95em;
+        }
+
+        /* Адаптивность для мобильных: карточка встает вниз */
+        @media (max-width: 1050px) {
+            .layout-wrapper {
+                flex-direction: column;
+            }
+            .card-blue {
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+                gap: 20px;
+            }
+            .card-blue h2 {
+                border-bottom: none;
+                border-right: 1px solid #4a90e2;
+                padding-bottom: 0;
+                padding-right: 20px;
+                margin: 0;
+            }
+        }
 
         /* Стили карточек */
         .card {
