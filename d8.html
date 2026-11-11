@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="favicon-blue.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Второй уровень — в разработке</title>
+    <title>Второй уровень — Генератор этажа</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
 
@@ -13,9 +13,9 @@
             background-color: #0f1722; 
             background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #c9d6e8;
-            max-width: 800px;
+            max-width: 1300px; 
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 20px;
             line-height: 1.6;
             box-sizing: border-box;
             min-height: 100vh;
@@ -33,7 +33,7 @@
             font-size: 2.2em;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         a {
@@ -50,21 +50,282 @@
         .nav-link {
             display: block;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 1.1em;
         }
 
-        .placeholder {
+        /* --- ОСНОВНАЯ СЕТКА МАКЕТА --- */
+        .main-layout {
+            display: grid;
+            grid-template-columns: minmax(400px, 1fr) minmax(350px, 400px); 
+            gap: 20px;
+            width: 100%;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Стили для карточек */
+        .generator-container, .special-room-container, .mutator-container, .door-container, .theme-container, .transition-container {
             background-color: rgba(27, 40, 56, 0.8);
             border: 1px solid #333;
             border-left: 5px solid #2c5a8c;
-            padding: 20px 25px;
-            margin: 20px 0;
+            padding: 15px 20px;
             border-radius: 6px;
-            color: #8c9eb5;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 100%;
             box-sizing: border-box;
+        }
+
+        .transition-container {
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        .special-room-container h2, .mutator-container h2, .theme-container h2, .transition-container h2, .door-container h2 {
+            font-family: 'Cinzel', serif;
+            color: #7ab5f5;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3em;
+        }
+
+        .btn-generate {
+            background-color: #4a90e2;
+            color: #0f1722;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            align-self: center;
+        }
+
+        .btn-generate:hover {
+            background-color: #7ab5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.4);
+        }
+        
+        .btn-generate:active { transform: translateY(0); }
+
+        /* Обертка для сетки и счетчика */
+        .dungeon-wrapper {
+            display: none;
+            gap: 20px;
+            align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .dungeon-wrapper.active { display: flex; }
+
+        @media (max-width: 600px) {
+            .dungeon-wrapper.active { flex-direction: column; align-items: center; }
+        }
+
+        /* Сетка */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(15, 30px);
+            grid-template-rows: repeat(15, 30px);
+            gap: 4px; 
+            background-color: #0a0f16;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #333; 
+            border-radius: 4px;
+            transition: all 0.2s;
+            position: relative; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px; 
+            user-select: none; 
+        }
+
+        .cell.room {
+            background-color: #5a636e; 
+            box-shadow: inset 0 0 5px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Счетчик */
+        .counter-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(15, 23, 34, 0.9);
+            border: 1px solid #2c5a8c;
+            border-radius: 8px;
+            padding: 15px 10px;
+            min-width: 100px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        .counter-title {
+            font-family: 'Cinzel', serif;
+            color: #4a90e2;
+            font-size: 0.9em;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .counter-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #c9d6e8;
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+            margin-bottom: 10px;
+            font-family: 'Cinzel', serif;
+        }
+        .counter-buttons { display: flex; gap: 10px; }
+        .btn-counter {
+            background-color: #2c5a8c;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn-counter:hover { background-color: #4a90e2; }
+        .btn-counter:active { transform: scale(0.95); }
+
+        /* Легенда */
+        .legend {
+            display: none;
+            margin-top: 15px;
+            width: 100%;
+            background-color: rgba(15, 23, 34, 0.6);
+            border: 1px solid #2c5a8c;
+            border-radius: 6px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 0.85em;
+        }
+        .legend.active { display: block; }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        .legend-item:last-child { margin-bottom: 0; }
+        .legend-icon { font-size: 1.2em; width: 25px; text-align: center; }
+
+        .info-text {
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #8c9eb5;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        /* Контейнеры для результатов */
+        .results-history {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* Контейнер для дверей (сетка 2х2, если их 4) */
+        .doors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .result-card {
+            background-color: rgba(15, 23, 34, 0.9);
+            border: 1px solid #2c5a8c;
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            animation: fadeIn 0.4s ease-out;
+            position: relative;
+            font-size: 0.95em;
+        }
+
+        .result-card.fade-out {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+
+        .result-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #2c5a8c;
+            padding-bottom: 5px;
+            color: #7ab5f5; 
+        }
+
+        .result-detail {
+            font-size: 1em;
+            color: #c9d6e8; 
+            margin-bottom: 5px;
+        }
+        .result-detail span { 
+            font-weight: bold; 
+            color: #4a90e2; 
+        }
+
+        /* Специфичные стили для тем */
+        .theme-card {
+            text-align: center;
+            border-color: #4a90e2;
+            background: linear-gradient(145deg, rgba(27, 40, 56, 0.95), rgba(15, 23, 34, 0.95));
+            padding: 10px;
+        }
+        .theme-card .result-title {
+            border: none;
+            font-size: 1.4em;
+            margin-bottom: 0;
+            color: #4a90e2; 
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(20px); }
+        }
+
+        /* Правая колонка */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
     </style>
 </head>
@@ -72,8 +333,544 @@
     <h1>🎲 Второй уровень</h1>
     <a href="kadgar.html" class="nav-link">← Назад в Инструменты Кадгара</a>
 
-    <div class="placeholder">
-        <p>Страница в разработке. Здесь скоро появится генератор этажа для второго уровня подземелья (от 1 до 8 дополнительных комнат).</p>
+    <!-- ДВУХКОЛОНОЧНЫЙ МАКЕТ -->
+    <div class="main-layout">
+        
+        <!-- ЛЕВАЯ КОЛОНКА: Генератор этажа -->
+        <div class="generator-container">
+            <button class="btn-generate" id="generate-btn">Создать этаж</button>
+            
+            <div class="dungeon-wrapper" id="dungeon-wrapper">
+                <div class="grid-container" id="grid"></div>
+                
+                <div class="counter-panel">
+                    <div class="counter-title">Счётчик этажей</div>
+                    <div class="counter-display" id="floor-count">2</div>
+                    <div class="counter-buttons">
+                        <button class="btn-counter" id="btn-minus">-</button>
+                        <button class="btn-counter" id="btn-plus">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend" id="legend">
+                <div class="legend-item"><span class="legend-icon">🚩</span> <span>Старт</span></div>
+                <div class="legend-item"><span class="legend-icon">💀</span> <span>Босс (финиш)</span></div>
+                <div class="legend-item"><span class="legend-icon">⚠️</span> <span>Ловушки и награда</span></div>
+                <div class="legend-item"><span class="legend-icon">🧩</span> <span>Головоломка и награда</span></div>
+                <div class="legend-item"><span class="legend-icon">❓</span> <span>Особая клетка</span></div>
+                <div class="legend-item"><span class="legend-icon">🔑</span> <span>Секретная комната</span></div>
+            </div>
+
+            <div class="info-text" id="info"></div>
+        </div>
+
+        <!-- ПРАВАЯ КОЛОНКА: Остальные генераторы -->
+        <div class="right-column">
+            <!-- ГЕНЕРАТОР ОСОБЫХ КОМНАТ -->
+            <div class="special-room-container">
+                <h2>🎲 Генератор особых комнат</h2>
+                <button class="btn-generate" id="generate-special-btn">Создать комнату</button>
+                <div class="results-history" id="special-history"></div>
+            </div>
+
+            <!-- ГЕНЕРАТОР МУТАТОРОВ -->
+            <div class="mutator-container">
+                <h2>☣️ Мутаторы подземелья</h2>
+                <button class="btn-generate" id="generate-mutator-btn">Создать мутатор</button>
+                <div class="results-history" id="mutator-history"></div>
+            </div>
+
+            <!-- ГЕНЕРАТОР ДВЕРЕЙ -->
+            <div class="door-container">
+                <h2>🚪 Хотим Дверь</h2>
+                <button class="btn-generate" id="generate-door-btn">Запилить дверь</button>
+                <div class="results-history" id="door-history"></div>
+            </div>
+
+            <!-- ГЕНЕРАТОР ТЕМ -->
+            <div class="theme-container">
+                <h2>🎨 Генератор тем</h2>
+                <button class="btn-generate" id="generate-theme-btn">Создать тему</button>
+                <div class="results-history" id="theme-history"></div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- НОВЫЙ БЛОК: ПЕРЕХОД МЕЖДУ ЭТАЖАМИ -->
+    <div class="transition-container">
+        <h2>🚪 Переход между этажами</h2>
+        <p style="text-align: center; margin-top: 0; margin-bottom: 15px; color: #8c9eb5;">Создать 1-4 магических двери, в которые можно зайти.</p>
+        <button class="btn-generate" id="generate-transition-btn">Создать</button>
+        
+        <div class="doors-grid" id="transition-results"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ==========================================
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function addToHistory(containerId, htmlContent, isTheme = false) {
+            const container = document.getElementById(containerId);
+            const newCard = document.createElement('div');
+            newCard.className = isTheme ? 'result-card theme-card' : 'result-card';
+            newCard.innerHTML = htmlContent;
+
+            container.prepend(newCard);
+
+            if (container.children.length > 3) {
+                const oldCard = container.lastElementChild;
+                oldCard.classList.add('fade-out');
+                setTimeout(() => {
+                    if (oldCard.parentNode === container) container.removeChild(oldCard);
+                }, 300); 
+            }
+        }
+
+        // ==========================================
+        // ГЕНЕРАТОР ЭТАЖА (ВТОРОЙ УРОВЕНЬ)
+        // ==========================================
+        const GRID_SIZE = 15;
+        const gridContainer = document.getElementById('grid');
+        const generateBtn = document.getElementById('generate-btn');
+        const infoText = document.getElementById('info');
+        const legend = document.getElementById('legend');
+        const dungeonWrapper = document.getElementById('dungeon-wrapper');
+        const floorCountDisplay = document.getElementById('floor-count');
+        const btnPlus = document.getElementById('btn-plus');
+        const btnMinus = document.getElementById('btn-minus');
+        
+        let currentFloor = 2;
+
+        btnPlus.addEventListener('click', () => { currentFloor++; floorCountDisplay.textContent = currentFloor; });
+        btnMinus.addEventListener('click', () => { if (currentFloor > 1) { currentFloor--; floorCountDisplay.textContent = currentFloor; } });
+
+        function isValid(x, y) { return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE; }
+        function countNeighbors(x, y, roomsSet) {
+            let count = 0;
+            for (let [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+                if (roomsSet.has(`${x + dx},${y + dy}`)) count++;
+            }
+            return count;
+        }
+
+        function generateDungeon() {
+            gridContainer.innerHTML = '';
+            const roomsSet = new Set();
+            const startX = Math.floor(GRID_SIZE / 2);
+            const startY = Math.floor(GRID_SIZE / 2);
+            roomsSet.add(`${startX},${startY}`);
+            
+            // 1. 4 обязательные комнаты
+            let added = 1;
+            while (added < 4) {
+                const roomsArray = Array.from(roomsSet);
+                const randomRoom = getRandomItem(roomsArray);
+                const [cx, cy] = randomRoom.split(',').map(Number);
+                const [dx, dy] = getRandomItem([[0, -1], [0, 1], [-1, 0], [1, 0]]);
+                const nx = cx + dx; const ny = cy + dy; const key = `${nx},${ny}`;
+                if (isValid(nx, ny) && !roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 1) {
+                    roomsSet.add(key); added++;
+                }
+            }
+
+            // 2. От 1 до 8 доп. комнат
+            const extraRooms = getRandomInt(1, 8);
+            let attempts = 0; let extraAdded = 0;
+            while (extraAdded < extraRooms && attempts < 500) {
+                attempts++;
+                const randomRoom = getRandomItem(Array.from(roomsSet));
+                const [cx, cy] = randomRoom.split(',').map(Number);
+                const [dx, dy] = getRandomItem([[0, -1], [0, 1], [-1, 0], [1, 0]]);
+                const nx = cx + dx; const ny = cy + dy; const key = `${nx},${ny}`;
+                if (isValid(nx, ny) && !roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 2) {
+                    roomsSet.add(key); extraAdded++;
+                }
+            }
+
+            // 3. Поиск босса (BFS)
+            const queue = [{ x: startX, y: startY, dist: 0 }];
+            const visited = new Set([`${startX},${startY}`]);
+            let farthestRoom = { x: startX, y: startY };
+            let maxDistance = -1;
+
+            while (queue.length > 0) {
+                const current = queue.shift();
+                if (current.dist > maxDistance) { maxDistance = current.dist; farthestRoom = { x: current.x, y: current.y }; }
+                for (let [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+                    const nx = current.x + dx; const ny = current.y + dy; const key = `${nx},${ny}`;
+                    if (roomsSet.has(key) && !visited.has(key)) {
+                        visited.add(key); queue.push({ x: nx, y: ny, dist: current.dist + 1 });
+                    }
+                }
+            }
+
+            // 4. Сбор свободных комнат
+            const availableRooms = [];
+            roomsSet.forEach(key => {
+                const [x, y] = key.split(',').map(Number);
+                if (!(x === startX && y === startY) && !(x === farthestRoom.x && y === farthestRoom.y)) {
+                    availableRooms.push({ x, y });
+                }
+            });
+
+            // 5. ДВЕ случайные комнаты с событиями (ловушки/головоломки)
+            let event1 = null, icon1 = '';
+            let event2 = null, icon2 = '';
+            
+            if (availableRooms.length >= 2) {
+                // Первая комната
+                let randIdx1 = getRandomInt(0, availableRooms.length - 1);
+                event1 = availableRooms[randIdx1];
+                icon1 = Math.random() < 0.5 ? '⚠️' : '🧩';
+                availableRooms.splice(randIdx1, 1);
+
+                // Вторая комната
+                let randIdx2 = getRandomInt(0, availableRooms.length - 1);
+                event2 = availableRooms[randIdx2];
+                icon2 = Math.random() < 0.5 ? '⚠️' : '🧩';
+                availableRooms.splice(randIdx2, 1);
+            } else if (availableRooms.length === 1) {
+                // Если комната всего одна, ставим один ивент
+                let randIdx = getRandomInt(0, availableRooms.length - 1);
+                event1 = availableRooms[randIdx];
+                icon1 = Math.random() < 0.5 ? '⚠️' : '🧩';
+                availableRooms.splice(randIdx, 1);
+            }
+
+            // 6. Особые комнаты (макс 2)
+            let specialRoom1 = null;
+            let specialRoom2 = null;
+
+            if (availableRooms.length >= 6) {
+                // 2 особые
+                let randIdx1 = getRandomInt(0, availableRooms.length - 1);
+                specialRoom1 = availableRooms[randIdx1];
+                availableRooms.splice(randIdx1, 1);
+
+                let randIdx2 = getRandomInt(0, availableRooms.length - 1);
+                specialRoom2 = availableRooms[randIdx2];
+                availableRooms.splice(randIdx2, 1);
+            } else if (availableRooms.length >= 3) {
+                // 1 особая
+                let randIdx = getRandomInt(0, availableRooms.length - 1);
+                specialRoom1 = availableRooms[randIdx];
+                availableRooms.splice(randIdx, 1);
+            }
+
+            // 7. Секретная комната 🔑 (если есть обе особые)
+            let secretRoom = null;
+            if (specialRoom1 && specialRoom2) {
+                // Ищем место, где максимум 2 соседа
+                let found = false;
+                let attemptsSecret = 0;
+                
+                // Сначала пробуем среди свободных комнат
+                const availableForSecret = [...availableRooms];
+                while (!found && availableForSecret.length > 0) {
+                    let randIdx = getRandomInt(0, availableForSecret.length - 1);
+                    let candidate = availableForSecret[randIdx];
+                    if (countNeighbors(candidate.x, candidate.y, roomsSet) <= 2) {
+                        secretRoom = candidate;
+                        found = true;
+                    }
+                    availableForSecret.splice(randIdx, 1);
+                }
+
+                // Если среди готовых не нашли, ищем по всей сетке
+                if (!found) {
+                    let attemptsAll = 0;
+                    while (!found && attemptsAll < 500) {
+                        attemptsAll++;
+                        const nx = getRandomInt(0, GRID_SIZE - 1);
+                        const ny = getRandomInt(0, GRID_SIZE - 1);
+                        const key = `${nx},${ny}`;
+                        if (!roomsSet.has(key) && countNeighbors(nx, ny, roomsSet) <= 2) {
+                            secretRoom = { x: nx, y: ny };
+                            roomsSet.add(key);
+                            found = true;
+                        }
+                    }
+                }
+            }
+
+            // 8. Отрисовка
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (roomsSet.has(`${x},${y}`)) {
+                        cell.classList.add('room');
+                        if (x === startX && y === startY) cell.textContent = '🚩';
+                        else if (x === farthestRoom.x && y === farthestRoom.y) cell.textContent = '💀'; 
+                        else if (event1 && x === event1.x && y === event1.y) cell.textContent = icon1;
+                        else if (event2 && x === event2.x && y === event2.y) cell.textContent = icon2;
+                        else if (specialRoom1 && x === specialRoom1.x && y === specialRoom1.y) cell.textContent = '❓';
+                        else if (specialRoom2 && x === specialRoom2.x && y === specialRoom2.y) cell.textContent = '❓';
+                        else if (secretRoom && x === secretRoom.x && y === secretRoom.y) cell.textContent = '🔑';
+                    }
+                    gridContainer.appendChild(cell);
+                }
+            }
+
+            dungeonWrapper.classList.add('active');
+            legend.classList.add('active');
+            infoText.textContent = `Этаж готов! Комнат: ${roomsSet.size}. До босса ${maxDistance} шагов.`;
+        }
+        generateBtn.addEventListener('click', generateDungeon);
+
+
+        // ==========================================
+        // ГЕНЕРАТОР ОСОБЫХ КОМНАТ
+        // ==========================================
+        const specialBtn = document.getElementById('generate-special-btn');
+
+        function generateSpecialRoom() {
+            const roomTypes = ["Торговец", "Квестодатель", "Сокровищница", "Комната Удачи", "Жертвенная комната", "Комната испытаний"];
+            const roomType = getRandomItem(roomTypes);
+            let contentHtml = '';
+
+            switch(roomType) {
+                case "Торговец":
+                    contentHtml = `<div class="result-detail">Ассортимент: <span>${getRandomItem(["Оружия и посохи", "Доспехи и щиты", "Свитки и расходники", "Мощные артефакты", "Обменник безделушек"])}</span></div>`;
+                    break;
+                case "Квестодатель":
+                    contentHtml = `<div class="result-detail">Тип задания: <span>${getRandomItem(["Убийство", "Сбор", "Доставка", "Сопровождение"])}</span></div>`;
+                    break;
+                case "Сокровищница":
+                    contentHtml = `<div class="result-detail">Содержимое: <span>${getRandomItem(["Ближнее оружие", "Дальнее оружие", "Магическое", "Доспех", "Артефакт"])}</span></div>`;
+                    break;
+                case "Комната Удачи":
+                    contentHtml = `<div class="result-detail">Эффект: <span>${getRandomItem(["Оружие получает преимущество на первые две атаки", "Увеличена скорость перемещения на 10 фт", "В конце каждого хода лечит на к4+БМ", "С шансом в 33% можно не потратить ячейку заклинания", "Ваш урон увеличен на ваш БМ", "Даёт эффект везунчика на один раз", "Оружие получает помеху на первые две атаки", "Уменьшена скорость перемещения на 10 фт", "В конце каждого хода наносит урон на к4+БМ", "С шансом в 33% можно потратить лишнюю ячейку заклинаний", "Ваш урон уменьшен на ваш БМ", "Даёт эффект везунчика против вас на один раз"])}</span></div>`;
+                    break;
+                case "Жертвенная комната":
+                    contentHtml = `
+                        <div class="result-detail">Требование: <span>${getRandomItem(["Пожертвовать одной костью максимального здоровья на этаж (66% шанс на награду)", "Пожертвовать возможностью делать короткий отдых (100% шанс на награду, одноразово)", "Пожертвовать рационом (15% шанс на награду)", "Пожертвовать предметом (доспех/оружие/артефакт) (33% шанс на награду)", "Пожертвовать ячейку заклинаний на этаж (66% шанс на награду)", "Пожертвовать 5 фт максимальной скорости на этаж (66% шанс на награду)"])}</span></div>
+                        <div class="result-detail" style="margin-top: 10px;">Награда: <span>${getRandomItem(["Развеивает эффект 1 мутатора", "Дарует какой-либо магический артефакт", "Дарует какой-либо доспех", "Дарует какое-либо оружие", "Дарует какой-либо из баффов от фонтана до конца этажа", "Дарует знание какие типы комнат находятся рядом", "Даёт эффект длительного отдыха", "Даёт эффект какого-либо дебафа от фонтана до конца этажа"])}</span></div>
+                    `;
+                    break;
+                case "Комната испытаний":
+                    contentHtml = `<div class="result-detail">Испытание: <span>${getRandomItem(["Пройти комнату без использование рывков", "Пройти комнату без бонусных действий", "Пройти комнату без бонусных умений", "Пройти комнату без реакций", "Пройти комнату не получив урона", "Пройти комнату не используя заклинаний", "Пройти комнату не больше чем за 4 раунда", "Пройти комнату не используя вообще ничего"])}</span></div>`;
+                    break;
+            }
+
+            const html = `<div class="result-title">${roomType}</div>${contentHtml}`;
+            addToHistory('special-history', html, false);
+        }
+        specialBtn.addEventListener('click', generateSpecialRoom);
+
+
+        // ==========================================
+        // ГЕНЕРАТОР МУТАТОРОВ
+        // ==========================================
+        const mutatorBtn = document.getElementById('generate-mutator-btn');
+
+        const mutatorsData = [
+            "В подземелье очень темно (нужны источники освещения, иногда есть магическая тьма в комнатах)",
+            "Невероятно холодно (штраф к скорости и накапливающееся истощение если не обогреваться или не употреблять рационы в пищу каждые несколько комнат)",
+            "Всё затоплено (хорошая проводимость электричества, уменьшена скорость передвижения)",
+            "Духота, жидкость быстро испаряется (невозможно восстановить здоровье зельями, тк они испаряются как только игрок или монстр их открывает)",
+            "Повышенная освещённость (невозможность делать короткий отдых и скрываться из-за магической освещённости)",
+            "Местность дикой магии (любое сотворение магии вызывает эффект дикой магии)",
+            "Немагическая среда (магия перестаёт работать, частично или везде)",
+            "Металл становится тяжелее (всё металлическое становится тяжелее нормы, оружие имеющее металл в себе бьёт с помехой)",
+            "Некоторые клетки становятся трясиной. Попадание в них — спасбросок Ловкости, иначе скорость 0 и утопание",
+            "Вся поверхность скользкая. При рывке или перемещении более чем на 2 клетки — спасбросок Ловкости, иначе падение",
+            "В случайных местах открываются разломы с лавой (6к6 урона на этих тайлах, а всё что касается их - загорается)",
+            "Область сильно заслонена туманом, дальние атаки имеют помеху, но также преимущество на скрытность",
+            "Движущие потоки - сдувают каждого на 2 клетки в определенную сторону",
+            "Иногда обрушивается пол под ногами (Спас ловкости иначе большой урон)",
+            "После смерти существа взрываются с радиусом в 5 фт, нанося всем 6к6 урона взрывом",
+            "На полу иногда появляются невидимые ловушки-капканы",
+            "Все получают преимущество к броскам атаки",
+            "Здоровье урезано на половину",
+            "В начале каждой комнаты спас МДР 14 иначе получаешь состояние безумия на 1 ход",
+            "Каждый промах - доп к4 на следующую атаку и каждое попадание - отнять к4 от следующей атаки"
+        ];
+
+        function generateMutator() {
+            const text = getRandomItem(mutatorsData);
+            const html = `<div class="result-title">Мутатор</div><div class="result-detail">${text}</div>`;
+            addToHistory('mutator-history', html, false);
+        }
+        mutatorBtn.addEventListener('click', generateMutator);
+
+
+        // ==========================================
+        // ГЕНЕРАТОР ДВЕРЕЙ
+        // ==========================================
+        const doorBtn = document.getElementById('generate-door-btn');
+        const doorHistory = document.getElementById('door-history');
+
+        const doorOptions = [
+            "Плати здоровьем",
+            "Плати рационом",
+            "Плати максимумом ОЗ",
+            "Плати статами силы",
+            "Плати статами ловкости",
+            "Плати статами телосложения",
+            "Плати статами интеллекта",
+            "Плати статами мудрости",
+            "Плати статами харизмы",
+            "Плати деньгами",
+            "Нужен ключ",
+            "Нужен пароль",
+            "Плати ячейкой заклинаний",
+            "Плати магическим предметом",
+            "Плати годами жизни"
+        ];
+
+        function generateDoor() {
+            const text = getRandomItem(doorOptions);
+            const html = `<div class="result-title">Дверь требует</div><div class="result-detail">${text}</div>`;
+            addToHistory('door-history', html, false);
+        }
+        doorBtn.addEventListener('click', generateDoor);
+
+
+        // ==========================================
+        // ГЕНЕРАТОР ТЕМ (Выдает 5 уникальных)
+        // ==========================================
+        const themeBtn = document.getElementById('generate-theme-btn');
+
+        const themesData = [
+            "свечки", "джунгли", "небеса", "ад", "тюрьма", "катакомбы", "канализация", "облака", "бури", "луга", 
+            "библиотека", "кухня", "прачечная", "оранжерея", "маяк", "вокзал", "базар", "цирк", "театр", "бассейн", 
+            "аквариум", "улей", "муравейник", "гнездо", "скворечник", "чердак", "подвал", "балкон", "лестница", 
+            "лифт", "коридор", "спальня", "ванная", "туалет", "гараж", "мастерская", "кузница", "пекарня", 
+            "кондитерская", "аптека", "больница", "школа", "детсад", "стадион", "спортзал", "каток", "батут", 
+            "карусель", "колесо обозрения", "тир", "казино", "банк", "музей", "галерея", "архив", "обсерватория", 
+            "планетарий", "лаборатория", "фабрика", "шахта", "карьер", "плотина", "мельница", "ферма", "теплица", 
+            "пасека", "пруд", "болото", "оазис", "пустыня", "дюны", "айсберг", "ледник", "вулкан", "гейзер", 
+            "водопад", "пещера", "грот", "ущелье", "каньон", "обрыв", "курган", "могильник", "склеп", "мавзолей", 
+            "алтарь", "храм", "часовня", "монастырь", "крепость", "башня", "мост", "тоннель", "причал", "порт", 
+            "корабль", "подлодка", "плот", "канатная дорога", "шахта лифта", "колодец", "фонтан", "водосток", 
+            "канализация", "свалка", "полигон", "аэродром", "космодром", "ангар", "депо", "амбар", "сеновал", 
+            "конюшня", "курятник", "свинарник", "коровник", "овчарня", "голубятня", "террариум", "серпентарий", 
+            "зоопарк", "сафари", "заповедник", "ботанический сад", "парк", "сквер", "площадь", "бульвар", 
+            "переулок", "тупик", "двор", "палисадник", "огород", "сад", "виноградник", "плантация", "ранчо", 
+            "стойбище", "аул", "деревня", "хутор", "город", "квартал", "район", "окраина", "центр", "трущобы", 
+            "небоскрёб", "особняк", "дворец", "замок", "усадьба", "дача", "вилла", "хижина", "шалаш", "юрта", 
+            "чум", "иглу", "землянка", "бункер", "убежище", "бомбоубежище", "катакомбы", "лабиринт", "портал", 
+            "врата", "колодец времени", "библиотека снов", "чердак воспоминаний", "часы", "песочные часы", 
+            "календарь", "глобус", "компас", "карта", "атлас", "свиток", "пергамент", "чернила", "перо", "печать", 
+            "сургуч", "конверт", "марка", "посылка", "бандероль", "телеграф", "газета", "журнал", "афиша", 
+            "плакат", "вывеска", "витрина", "прилавок", "касса", "кошелёк", "сейф", "замок", "ключи", "скважина", 
+            "дверная ручка", "петли", "гвозди", "молоток", "пила", "рубанок", "стамеска", "отвёртка", 
+            "гаечный ключ", "тиски", "наковальня", "горн", "мехи", "литейная форма", "слитки", "проволока", 
+            "цепь", "кандалы", "решётка", "клетка", "вольер", "поводок", "ошейник", "намордник", "седло", 
+            "уздечка", "подкова", "хлыст", "шпоры", "стремя", "телега", "колесо", "ось", "оглобли", "сани", 
+            "лыжи", "коньки", "сноуборд", "скейт", "ролики", "велосипед", "самокат", "мотоцикл", "машина", 
+            "трамвай", "троллейбус", "автобус", "поезд", "вагон", "рельсы", "шпалы", "семафор", "стрелка", 
+            "перрон", "турникет", "эскалатор", "пандус", "перила", "ступеньки", "порог", "дверь", "ворота", 
+            "калитка", "забор", "изгородь", "плетень", "труба", "кран", "шланг", "насос", "бак", "цистерна", 
+            "бочка", "бидон", "кувшин", "горшок", "кастрюля", "сковорода", "чайник", "самовар", "чашка", 
+            "блюдце", "ложка", "вилка", "нож", "тарелка", "миска", "стакан", "рюмка", "бутылка", "графин", 
+            "штопор", "банка", "крышка", "пробка", "пакет", "корзина", "лукошко", "мешок", "рюкзак", "сумка", 
+            "портфель", "чемодан", "ящик", "сундук", "ларец", "шкатулка", "полка", "стеллаж", "этажерка", 
+            "стол", "стул", "табурет", "скамья", "кресло", "диван", "кровать", "гамак", "качели", "горка", 
+            "стремянка", "тачка", "носилки", "лопата", "грабли", "вилы", "коса", "серп", "плуг", "борона", 
+            "сеялка", "прялка", "веретено", "клубок", "спицы", "крючок", "напёрсток", "пуговица", "молния", 
+            "пряжка", "ремень", "шнурок", "бант", "лента", "веер", "зонт", "трость", "шляпа", "цилиндр", "кепка", 
+            "капюшон", "плащ", "шинель", "мантия", "мундир", "фартук", "халат", "пижама", "валенки", "галоши", 
+            "сандалии", "каблук", "подошва", "носок", "варежка", "муфта", "воротник", "манжета", "карман", 
+            "булавка", "игла", "шило", "кнопка", "скрепка", "закладка", "обложка", "переплёт", "страница", 
+            "корешок", "форзац", "иллюстрация", "буквица", "сноска", "фонарь", "лампа", "люстра", "канделябр", 
+            "факел", "костёр", "печь", "камин", "свеча", "спички", "фейерверк", "салют", "мыльные пузыри", 
+            "воздушный шар", "дирижабль", "парашют", "песочница", "кукла", "марионетка", "маска", "костюм", 
+            "перчатка", "шарф", "иголка", "нитки", "ткань", "ковёр", "подушка", "одеяло", "матрас", "шкаф", 
+            "комод", "коробка", "ведро", "лейка", "метла", "швабра", "губка", "мыло", "полотенце", "расчёска", 
+            "зубная щётка", "очки", "компас", "книга", "тетрадь", "карандаш", "ластик", "краски", "кисти", 
+            "мольберт", "рояль", "скрипка", "барабан", "колокол", "дудка", "ноты", "граммофон", "радио", 
+            "телевизор", "телефон", "компьютер", "робот", "шестерёнки", "пружины", "магниты", "батарейки", 
+            "лампочки", "провода", "зеркальце", "бусы", "кольца", "монеты", "кубки", "медали"
+        ];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function generateTheme() {
+            const container = document.getElementById('theme-history');
+            container.innerHTML = ''; 
+
+            let tempThemes = [...themesData];
+            shuffleArray(tempThemes);
+
+            const selectedThemes = tempThemes.slice(0, 5);
+
+            selectedThemes.forEach(theme => {
+                const html = `<div class="result-title">${theme}</div>`;
+                const card = document.createElement('div');
+                card.className = 'result-card theme-card';
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+        themeBtn.addEventListener('click', generateTheme);
+
+
+        // ==========================================
+        // ГЕНЕРАТОР ПЕРЕХОДОВ (ДВЕРИ)
+        // ==========================================
+        const transitionBtn = document.getElementById('generate-transition-btn');
+        const transitionResults = document.getElementById('transition-results');
+
+        const transitionOptions = [
+            {
+                title: "Торговец",
+                text: "Торговец! Этот - в отличии от всех умеет торговать чем угодно!"
+            },
+            {
+                title: "Квестодатель",
+                text: "Квестодатель! Вы его могли уже видеть, а может видите впервые!"
+            },
+            {
+                title: "Сокровище",
+                text: "В этой комнате лежит случайное богатство",
+                extra: ["оружие ближнего боя", "оружие дальнего боя", "доспехи или щиты", "артефакты", "расходники"]
+            },
+            {
+                title: "Алтарь",
+                text: "Это магически-божественный алтарь... У него можно сохранить свой прогресс если отдать ему что-то взамен..."
+            }
+        ];
+
+        function generateTransitions() {
+            transitionResults.innerHTML = ''; 
+
+            const count = getRandomInt(1, 4);
+            let tempOptions = [...transitionOptions];
+            shuffleArray(tempOptions);
+            const selectedOptions = tempOptions.slice(0, count);
+
+            selectedOptions.forEach(option => {
+                let textContent = option.text;
+                if (option.extra) {
+                    textContent += `: <span>${getRandomItem(option.extra)}</span>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div class="result-title">${option.title}</div>
+                    <div class="result-detail">${textContent}</div>
+                `;
+                transitionResults.appendChild(card);
+            });
+        }
+        transitionBtn.addEventListener('click', generateTransitions);
+    </script>
 </body>
 </html>
