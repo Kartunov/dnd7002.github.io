@@ -6,53 +6,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Всякие случайности — D&D</title>
     <style>
+        /* Подключаем шрифт для заголовков */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
+
         body {
             font-family: Georgia, serif;
+            /* Фон с текстурой */
             background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #e8e0d0;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
+            box-sizing: border-box;
         }
+
         h1 {
+            font-family: 'Cinzel', serif;
             color: #c9a227;
             border-bottom: 2px solid #c9a227;
             padding-bottom: 10px;
+            text-align: center;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-top: 0;
         }
-        h2 {
-            color: #c9a227;
-        }
+
         a {
             color: #e8b84b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover { color: #fff; }
+
+        .header-nav {
+            text-align: center;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .card {
+            background-color: rgba(42, 42, 42, 0.95);
+            border: 1px solid #444;
+            border-left: 5px solid #c9a227;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
         }
         
-        .card {
-            background-color: #2a2a2a;
-            border-left: 4px solid #c9a227;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 4px;
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+        }
+
+        .card h2 {
+            color: #c9a227;
+            margin-top: 0;
+            font-family: 'Cinzel', serif;
+            font-size: 1.4em;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        
+        .card p {
+            color: #a89f8c;
+            margin-bottom: 20px;
+            font-style: italic;
         }
 
         .btn {
             background-color: #c9a227;
             color: #1a1a1a;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 1.1em;
-            font-family: inherit;
+            font-family: 'Cinzel', serif;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.1s;
-            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .btn:hover {
-            background-color: #e8b84b;
+        .btn:hover { 
+            background-color: #e8b84b; 
         }
-        .btn:active {
-            transform: scale(0.98);
+        .btn:active { 
+            transform: scale(0.98); 
         }
 
         .results-container {
@@ -65,9 +107,17 @@
         .result-item {
             background-color: #1a1a1a;
             border: 1px solid #444;
-            padding: 15px;
+            border-left: 3px solid #555;
+            padding: 15px 20px;
             border-radius: 4px;
             animation: fadeIn 0.3s ease-in-out;
+            font-size: 1.05em;
+            transition: border-color 0.2s;
+        }
+        
+        .result-item:hover {
+            border-left-color: #c9a227;
+            background-color: #222;
         }
         
         .result-item strong {
@@ -75,14 +125,16 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
+            from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
     <h1>🎲 Всякие случайности</h1>
-    <p><a href="index.html">← Назад на главную</a></p>
+    <div class="header-nav">
+        <a href="index.html">← Назад на главную</a>
+    </div>
 
     <!-- Блок 1: Особое свойство оружия -->
     <div class="card">
@@ -90,14 +142,49 @@
         <p>Выдайте оружию особое свойство!</p>
         <button class="btn" id="roll-weapon-btn">Выдать</button>
         
-        <!-- Контейнер для выпадающих эффектов -->
         <div class="results-container" id="weapon-results">
             <!-- Сюда будут добавляться результаты -->
         </div>
     </div>
 
+    <!-- Блок 2: Руны улучшающие оружия -->
+    <div class="card">
+        <h2>Руны улучшающие оружия</h2>
+        <p>Вставьте руну в ваш клинок или посох!</p>
+        <button class="btn" id="roll-rune-btn">Выдать</button>
+        
+        <div class="results-container" id="rune-results">
+            <!-- Сюда будут добавляться результаты -->
+        </div>
+    </div>
+
+    <!-- Блок 3: Побочные эффекты зелий -->
+    <div class="card">
+        <h2>Побочные эффекты зелий</h2>
+        <p>Что там замешано в этой бурде?</p>
+        <button class="btn" id="roll-potion-btn">Выдать</button>
+        
+        <div class="results-container" id="potion-results">
+            <!-- Сюда будут добавляться результаты -->
+        </div>
+    </div>
+
+    <!-- Блок 4: Безделушки с чёрного рынка -->
+    <div class="card">
+        <h2>Безделушки с чёрного рынка</h2>
+        <p>Что-то интересное и необычное...</p>
+        <button class="btn" id="roll-market-btn">Выдать</button>
+        
+        <div class="results-container" id="market-results">
+            <!-- Сюда будут добавляться результаты -->
+        </div>
+    </div>
+
     <script>
-        // Массив со всеми 100 эффектами (взято из PDF)
+        // ==========================================
+        // БАЗЫ ДАННЫХ
+        // ==========================================
+
         const weaponEffects = [
             "Поглощение: У оружия есть 4 заряда. Если вас атакуют, когда вы владеете этим оружием, вы можете потратить 1 заряд и использовать реакцию, чтобы уменьшить получаемый урон на 1к12. Это свойство не работает, если вы без сознания, связаны или иным образом не можете двигаться. Оружие восстанавливает 1к4 заряда на рассвете.",
             "Тревога: Оружие начинает издавать звук колокола, когда демон, аберрация, фея, нежить, дракон или элементаль приближается к нему на расстояние 30 футов.",
@@ -201,63 +288,6 @@
             "Невесомость: После настройки это оружие становится фактически невесомым для владельца. Может использоваться как оружие для фехтования независимо от размера."
         ];
 
-        // Получаем элементы страницы
-        const btn = document.getElementById('roll-weapon-btn');
-        const resultsContainer = document.getElementById('weapon-results');
-        let itemCounter = 0; // Счетчик для уникальных ID (если понадобятся)
-
-        // Функция для генерации случайного эффекта
-        function rollWeaponEffect() {
-            // 1. Выбираем случайный эффект
-            const randomIndex = Math.floor(Math.random() * weaponEffects.length);
-            const effectText = weaponEffects[randomIndex];
-
-            // 2. Разделяем на Название и Описание (по первому двоеточию)
-            let title = "Эффект";
-            let description = effectText;
-            
-            const colonIndex = effectText.indexOf(':');
-            if (colonIndex !== -1) {
-                title = effectText.substring(0, colonIndex).trim();
-                description = effectText.substring(colonIndex + 1).trim();
-            }
-
-            // 3. Создаем HTML-элемент для нового результата
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'result-item';
-            resultDiv.innerHTML = `<strong>${title}:</strong> ${description}`;
-
-            // 4. Добавляем его в начало контейнера
-            resultsContainer.prepend(resultDiv);
-
-            // 5. Проверяем, не стало ли элементов больше 3
-            if (resultsContainer.children.length > 3) {
-                // Удаляем самый последний (нижний) элемент
-                resultsContainer.lastElementChild.remove();
-            }
-        }
-
-        // Вешаем обработчик клика на кнопку
-        btn.addEventListener('click', rollWeaponEffect);
-    </script>
-        <!-- Блок 2: Руны улучшающие оружия -->
-    <div class="card">
-        <h2>Руны улучшающие оружия</h2>
-        <p>Вставьте руну в ваш клинок или посох!</p>
-        <button class="btn" id="roll-rune-btn">Выдать</button>
-        
-        <!-- Контейнер для выпадающих рун -->
-        <div class="results-container" id="rune-results">
-            <!-- Сюда будут добавляться результаты -->
-        </div>
-    </div>
-
-    <script>
-                // ==========================================
-        // БЛОК 2: РУНЫ
-        // ==========================================
-
-        // Массив со всеми 100 рунами (взято из PDF)
         const weaponRunes = [
             "Руна ветра: Когда враг получает удар этим оружием, он должен совершить спасбросок Ловкости или его оттолкнёт на 5 футов назад.",
             "Руна белки: Даёт преимущество при проверках Акробатики.",
@@ -361,63 +391,6 @@
             "Руна рун: При критическом попадании руна ярко вспыхивает, и на оружии образуется дополнительная руна. Бросьте к100 по этой таблице, чтобы определить новую добавленную руну. При критическом промахе другая случайная руна исчезает. Если Руна рун — единственная оставшаяся руна и вы критически промахнулись, Руна рун исчезает."
         ];
 
-        // Получаем элементы для блока рун
-        const runeBtn = document.getElementById('roll-rune-btn');
-        const runeResultsContainer = document.getElementById('rune-results');
-
-        // Функция для генерации случайной руны
-        function rollWeaponRune() {
-            // 1. Выбираем случайную руну
-            const randomIndex = Math.floor(Math.random() * weaponRunes.length);
-            const runeText = weaponRunes[randomIndex];
-
-            // 2. Разделяем на Название и Описание (по первому двоеточию)
-            let title = "Руна";
-            let description = runeText;
-            
-            const colonIndex = runeText.indexOf(':');
-            if (colonIndex !== -1) {
-                title = runeText.substring(0, colonIndex).trim();
-                description = runeText.substring(colonIndex + 1).trim();
-            }
-
-            // 3. Создаем HTML-элемент для нового результата
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'result-item';
-            resultDiv.innerHTML = `<strong>${title}:</strong> ${description}`;
-
-            // 4. Добавляем его в начало контейнера
-            runeResultsContainer.prepend(resultDiv);
-
-            // 5. Проверяем, не стало ли элементов больше 3
-            if (runeResultsContainer.children.length > 3) {
-                // Удаляем самый последний (нижний) элемент
-                runeResultsContainer.lastElementChild.remove();
-            }
-        }
-
-        // Вешаем обработчик клика на кнопку рун
-        runeBtn.addEventListener('click', rollWeaponRune);
-    </script>
-
-        <!-- Блок 3: Побочные эффекты зелий -->
-    <div class="card">
-        <h2>Побочные эффекты зелий</h2>
-        <p>Что там замешано в этой бурде?</p>
-        <button class="btn" id="roll-potion-btn">Выдать</button>
-        
-        <!-- Контейнер для выпадающих эффектов зелий -->
-        <div class="results-container" id="potion-results">
-            <!-- Сюда будут добавляться результаты -->
-        </div>
-    </div>
-
-    <script>
-                // ==========================================
-        // БЛОК 3: ЗЕЛЬЯ
-        // ==========================================
-
-        // Массив со всеми 100 эффектами зелий
         const potionEffects = [
             "У вас по всему телу начинают расти перья.",
             "Вы чувствуете, что ваше тело меняется! Вы превращаетесь в маленькую лягушку на 1к4 дня.",
@@ -521,54 +494,6 @@
             "На следующие 1к4 часа огненный урон вас лечит."
         ];
 
-        // Получаем элементы для блока зелий
-        const potionBtn = document.getElementById('roll-potion-btn');
-        const potionResultsContainer = document.getElementById('potion-results');
-
-        // Функция для генерации эффекта зелья
-        function rollPotionEffect() {
-            // 1. Выбираем случайный эффект
-            const randomIndex = Math.floor(Math.random() * potionEffects.length);
-            const effectText = potionEffects[randomIndex];
-
-            // 2. Создаем HTML-элемент для нового результата
-            // (у зелий нет названий через двоеточие, поэтому выводим просто текст)
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'result-item';
-            resultDiv.innerHTML = effectText;
-
-            // 3. Добавляем его в начало контейнера
-            potionResultsContainer.prepend(resultDiv);
-
-            // 4. Проверяем, не стало ли элементов больше 3
-            if (potionResultsContainer.children.length > 3) {
-                // Удаляем самый последний (нижний) элемент
-                potionResultsContainer.lastElementChild.remove();
-            }
-        }
-
-        // Вешаем обработчик клика на кнопку зелий
-        potionBtn.addEventListener('click', rollPotionEffect);
-    </script>
-
-        <!-- Блок 4: Безделушки с чёрного рынка -->
-    <div class="card">
-        <h2>Безделушки с чёрного рынка</h2>
-        <p>Что-то интересное и необычное...</p>
-        <button class="btn" id="roll-market-btn">Выдать</button>
-        
-        <!-- Контейнер для выпадающих предметов -->
-        <div class="results-container" id="market-results">
-            <!-- Сюда будут добавляться результаты -->
-        </div>
-    </div>
-
-    <script>
-                // ==========================================
-        // БЛОК 4: ЧЁРНЫЙ РЫНОК
-        // ==========================================
-
-        // Массив со всеми 100 предметами
         const marketItems = [
             "Книга со странными пометками, которую, по слухам, забрали у мёртвого главы культа. На самом деле это была книга, исписанная малышом.",
             "Левая рука Маауга — большая перчатка, покрытая лезвиями. Она весит около 25 фунтов, и носить её практически невозможно.",
@@ -672,33 +597,52 @@
             "Кожаная перчатка. Говорят, что она принадлежала довольно известному вору и забрала с собой часть его силы — каждый раз, когда пользователь снимает её, есть 10%-ная вероятность того, что один из его пальцев исчезнет, навсегда похищенный духом вора."
         ];
 
-        // Получаем элементы для блока чёрного рынка
-        const marketBtn = document.getElementById('roll-market-btn');
-        const marketResultsContainer = document.getElementById('market-results');
+        // ==========================================
+        // ЛОГИКА ГЕНЕРАЦИИ
+        // ==========================================
 
-        // Функция для генерации предмета с чёрного рынка
-        function rollMarketItem() {
-            // 1. Выбираем случайный предмет
-            const randomIndex = Math.floor(Math.random() * marketItems.length);
-            const itemText = marketItems[randomIndex];
+        function createRoller(btnId, containerId, dataArray, useColon = true) {
+            const btn = document.getElementById(btnId);
+            const container = document.getElementById(containerId);
 
-            // 2. Создаем HTML-элемент для нового результата
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'result-item';
-            resultDiv.innerHTML = itemText;
+            btn.addEventListener('click', () => {
+                const randomIndex = Math.floor(Math.random() * dataArray.length);
+                const text = dataArray[randomIndex];
 
-            // 3. Добавляем его в начало контейнера
-            marketResultsContainer.prepend(resultDiv);
+                let title = "";
+                let description = text;
 
-            // 4. Проверяем, не стало ли элементов больше 3
-            if (marketResultsContainer.children.length > 3) {
-                // Удаляем самый последний (нижний) элемент
-                marketResultsContainer.lastElementChild.remove();
-            }
+                if (useColon) {
+                    const colonIndex = text.indexOf(':');
+                    if (colonIndex !== -1) {
+                        title = text.substring(0, colonIndex).trim();
+                        description = text.substring(colonIndex + 1).trim();
+                    }
+                }
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-item';
+                
+                if (title) {
+                    resultDiv.innerHTML = `<strong>${title}:</strong> ${description}`;
+                } else {
+                    resultDiv.textContent = description;
+                }
+
+                container.prepend(resultDiv);
+
+                // Оставляем только 3 последних результата
+                if (container.children.length > 3) {
+                    container.lastElementChild.remove();
+                }
+            });
         }
 
-        // Вешаем обработчик клика на кнопку
-        marketBtn.addEventListener('click', rollMarketItem);
+        // Инициализация всех генераторов
+        createRoller('roll-weapon-btn', 'weapon-results', weaponEffects, true);
+        createRoller('roll-rune-btn', 'rune-results', weaponRunes, true);
+        createRoller('roll-potion-btn', 'potion-results', potionEffects, false);
+        createRoller('roll-market-btn', 'market-results', marketItems, false);
     </script>
 </body>
 </html>
