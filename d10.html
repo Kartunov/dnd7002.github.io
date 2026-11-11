@@ -401,7 +401,7 @@
     <!-- НОВЫЙ БЛОК: ПЕРЕХОД МЕЖДУ ЭТАЖАМИ -->
     <div class="transition-container">
         <h2>🚪 Переход между этажами</h2>
-        <p style="text-align: center; margin-top: 0; margin-bottom: 15px; color: #8c9eb5;">Создать 1-4 магических двери, в которые можно зайти.</p>
+        <p style="text-align: center; margin-top: 0; margin-bottom: 15px; color: #8c9eb5;">Создать 1-3 магических двери, в которые можно зайти.</p>
         <button class="btn-generate" id="generate-transition-btn">Создать</button>
         
         <div class="doors-grid" id="transition-results"></div>
@@ -835,13 +835,37 @@
             }
         ];
 
-        function generateTransitions() {
+               function generateTransitions() {
             transitionResults.innerHTML = ''; 
 
-            const count = getRandomInt(1, 4);
-            let tempOptions = [...transitionOptions];
-            shuffleArray(tempOptions);
-            const selectedOptions = tempOptions.slice(0, count);
+            // Теперь от 1 до 3 дверей
+            const count = getRandomInt(1, 3);
+            
+            // Проверяем, повезло ли с Алтарем (10% шанс)
+            let includeAltar = false;
+            if (Math.random() < 0.10 && count > 0) {
+                includeAltar = true;
+            }
+
+            let selectedOptions = [];
+
+            if (includeAltar) {
+                // Если алтарь выпал, он занимает одно место
+                selectedOptions.push(transitionOptions.find(o => o.title === "Алтарь"));
+                
+                // Добавляем остальные (без алтаря)
+                let others = transitionOptions.filter(o => o.title !== "Алтарь");
+                shuffleArray(others);
+                selectedOptions = selectedOptions.concat(others.slice(0, count - 1));
+            } else {
+                // Алтарь не выпал, берем только обычные варианты
+                let others = transitionOptions.filter(o => o.title !== "Алтарь");
+                shuffleArray(others);
+                selectedOptions = others.slice(0, count);
+            }
+
+            // Перемешиваем итоговый результат, чтобы Алтарь не всегда был первым
+            shuffleArray(selectedOptions);
 
             selectedOptions.forEach(option => {
                 let textContent = option.text;
@@ -858,7 +882,6 @@
                 transitionResults.appendChild(card);
             });
         }
-        transitionBtn.addEventListener('click', generateTransitions);
     </script>
 </body>
 </html>
