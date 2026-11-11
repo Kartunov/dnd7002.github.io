@@ -69,9 +69,10 @@
             margin-bottom: 30px;
         }
 
+        /* Названия блоков (Генератор особых комнат и т.д.) */
         .special-room-container h2, .mutator-container h2, .theme-container h2 {
             font-family: 'Cinzel', serif;
-            color: #e8b84b;
+            color: #7ab5f5; /* Сделал названия блоков тоже синими */
             margin-top: 0;
             margin-bottom: 20px;
             text-align: center;
@@ -246,24 +247,24 @@
             animation: fadeOut 0.3s ease-in forwards;
         }
 
-        /* ИСПРАВЛЕНИЕ ЦВЕТА ТЕКСТА: Теперь заголовки и текст синие */
+        /* ИСПРАВЛЕНИЕ ЦВЕТА ЗАГОЛОВКОВ КАРТОЧЕК */
         .result-title {
             font-family: 'Cinzel', serif;
             font-size: 1.4em;
             margin-bottom: 10px;
             border-bottom: 1px solid #2c5a8c;
             padding-bottom: 5px;
-            color: #7ab5f5; /* Синий цвет заголовка */
+            color: #7ab5f5; /* Синий цвет */
         }
 
         .result-detail {
             font-size: 1.1em;
-            color: #c9d6e8; /* Светло-серый/синеватый для обычного текста */
+            color: #c9d6e8; /* Светло-серый */
             margin-bottom: 5px;
         }
         .result-detail span { 
             font-weight: bold; 
-            color: #4a90e2; /* Ярко-синий акцент для деталей */
+            color: #4a90e2; /* Ярко-синий акцент */
         }
 
         /* Специфичные стили для тем */
@@ -276,7 +277,7 @@
             border: none;
             font-size: 1.8em;
             margin-bottom: 0;
-            color: #4a90e2; /* Ярко-синий для самих тем */
+            color: #4a90e2; 
             text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
         }
 
@@ -355,7 +356,6 @@
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        // Универсальная функция для добавления карточки в историю (максимум 3)
         function addToHistory(containerId, htmlContent, isTheme = false) {
             const container = document.getElementById(containerId);
             const newCard = document.createElement('div');
@@ -570,7 +570,6 @@
         // ==========================================
         const themeBtn = document.getElementById('generate-theme-btn');
 
-        // Новый массив тем (твой список)
         const themesData = [
             "свечки", "джунгли", "небеса", "ад", "тюрьма", "катакомбы", "канализация", "облака", "бури", "луга", 
             "библиотека", "кухня", "прачечная", "оранжерея", "маяк", "вокзал", "базар", "цирк", "театр", "бассейн", 
@@ -624,7 +623,6 @@
             "лампочки", "провода", "зеркальце", "бусы", "кольца", "монеты", "кубки", "медали"
         ];
 
-        // Функция перемешивания массива (Алгоритм Фишера-Йетса)
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -634,16 +632,13 @@
 
         function generateTheme() {
             const container = document.getElementById('theme-history');
-            container.innerHTML = ''; // Очищаем старые результаты
+            container.innerHTML = ''; 
 
-            // Делаем копию массива, чтобы не перемешивать оригинал
             let tempThemes = [...themesData];
             shuffleArray(tempThemes);
 
-            // Берем первые 5 уникальных вариантов
             const selectedThemes = tempThemes.slice(0, 5);
 
-            // Создаем карточки для каждого из 5 вариантов
             selectedThemes.forEach(theme => {
                 const html = `<div class="result-title">${theme}</div>`;
                 const card = document.createElement('div');
