@@ -10,7 +10,6 @@
 
         body {
             font-family: Georgia, serif;
-            /* Темно-синий фон с текстурой */
             background-color: #0f1722; 
             background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #c9d6e8;
@@ -42,7 +41,6 @@
             margin-bottom: 40px;
         }
 
-        /* Общие стили для карточек */
         .card {
             display: flex;
             flex-direction: column;
@@ -68,7 +66,6 @@
             font-size: 1.05em;
         }
 
-        /* Желтая карточка (кликабельная) */
         .card-yellow {
             background-color: rgba(42, 42, 42, 0.95);
             border: 1px solid #444;
@@ -89,11 +86,10 @@
             color: #c9a227;
         }
 
-        /* Синяя карточка (кликабельная) */
         .card-blue-clickable {
             background-color: rgba(27, 40, 56, 0.95);
             border: 1px solid #333;
-            border-left: 5px solid #4a90e2; /* Ярко-синяя полоса */
+            border-left: 5px solid #4a90e2; 
             text-decoration: none;
             color: #c9d6e8;
             cursor: pointer;
@@ -107,7 +103,7 @@
         }
 
         .card-blue-clickable h2 {
-            color: #4a90e2; /* Ярко-синий заголовок */
+            color: #4a90e2; 
         }
     </style>
 </head>
@@ -115,31 +111,26 @@
     <div class="content-container">
         <h1>💙 Инструменты Кадгара</h1>
 
-        <!-- Желтая карточка возврата -->
         <a href="index.html" class="card card-yellow">
             <h2>Инструменты мастера</h2>
             <p>Иди на свет, твоей цели нет в этом подземелье, тебя ждут настоящие приключения</p>
         </a>
         
-        <!-- Синяя карточка-ссылка (Первый уровень) -->
         <a href="d6.html" class="card card-blue-clickable">
             <h2>Первый уровень</h2>
             <p>От 1 до 6 дополнительных комнат на этаж</p>
         </a>
 
-        <!-- Синяя карточка-ссылка (Второй уровень) -->
         <a href="d8.html" class="card card-blue-clickable">
             <h2>Второй уровень</h2>
             <p>От 1 до 8 дополнительных комнат на этаж</p>
-        </a> <!-- Вот здесь был пропущен закрывающий тег -->
+        </a>
 
-        <!-- Синяя карточка-ссылка (Третий уровень) -->
         <a href="d10.html" class="card card-blue-clickable">
             <h2>Третий уровень</h2>
             <p>От 1 до 10 дополнительных комнат на этаж</p>
         </a>
 
-        <!-- Синяя карточка-ссылка (Четвертый уровень) -->
         <a href="d12.html" class="card card-blue-clickable">
             <h2>Четвертый уровень</h2>
             <p>От 1 до 12 дополнительных комнат</p>
