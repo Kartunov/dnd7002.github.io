@@ -71,7 +71,7 @@
         }
 
         /* Стили для карточек */
-        .generator-container, .special-room-container, .mutator-container, .theme-container, .transition-container {
+        .generator-container, .special-room-container, .mutator-container, .door-container, .theme-container, .transition-container {
             background-color: rgba(27, 40, 56, 0.8);
             border: 1px solid #333;
             border-left: 5px solid #2c5a8c;
@@ -89,7 +89,7 @@
             margin-bottom: 30px;
         }
 
-        .special-room-container h2, .mutator-container h2, .theme-container h2, .transition-container h2 {
+        .special-room-container h2, .mutator-container h2, .theme-container h2, .transition-container h2, .door-container h2 {
             font-family: 'Cinzel', serif;
             color: #7ab5f5;
             margin-top: 0;
@@ -380,6 +380,13 @@
                 <div class="results-history" id="mutator-history"></div>
             </div>
 
+            <!-- ГЕНЕРАТОР ДВЕРЕЙ (НОВЫЙ, ВСТАВЛЕН ПЕРЕД ТЕМАМИ) -->
+            <div class="door-container">
+                <h2>🚪 Хотим Дверь</h2>
+                <button class="btn-generate" id="generate-door-btn">Запилить дверь</button>
+                <div class="results-history" id="door-history"></div>
+            </div>
+
             <!-- ГЕНЕРАТОР ТЕМ -->
             <div class="theme-container">
                 <h2>🎨 Генератор тем</h2>
@@ -623,6 +630,38 @@
 
 
         // ==========================================
+        // ГЕНЕРАТОР ДВЕРЕЙ (НОВЫЙ)
+        // ==========================================
+        const doorBtn = document.getElementById('generate-door-btn');
+        const doorHistory = document.getElementById('door-history');
+
+        const doorOptions = [
+            "Плати здоровьем",
+            "Плати рационом",
+            "Плати максимумом ОЗ",
+            "Плати статами силы",
+            "Плати статами ловкости",
+            "Плати статами телосложения",
+            "Плати статами интеллекта",
+            "Плати статами мудрости",
+            "Плати статами харизмы",
+            "Плати деньгами",
+            "Нужен ключ",
+            "Нужен пароль",
+            "Плати ячейкой заклинаний",
+            "Плати магическим предметом",
+            "Плати годами жизни"
+        ];
+
+        function generateDoor() {
+            const text = getRandomItem(doorOptions);
+            const html = `<div class="result-title">Дверь требует</div><div class="result-detail">${text}</div>`;
+            addToHistory('door-history', html, false);
+        }
+        doorBtn.addEventListener('click', generateDoor);
+
+
+        // ==========================================
         // ГЕНЕРАТОР ТЕМ (Выдает 5 уникальных)
         // ==========================================
         const themeBtn = document.getElementById('generate-theme-btn');
@@ -734,23 +773,15 @@
         ];
 
         function generateTransitions() {
-            transitionResults.innerHTML = ''; // Очищаем старые двери
+            transitionResults.innerHTML = ''; 
 
-            // 1. Определяем количество дверей (от 1 до 4)
             const count = getRandomInt(1, 4);
-            
-            // 2. Делаем копию массива и перемешиваем, чтобы выбрать уникальные
             let tempOptions = [...transitionOptions];
             shuffleArray(tempOptions);
-            
-            // 3. Берем нужное количество уникальных вариантов
             const selectedOptions = tempOptions.slice(0, count);
 
-            // 4. Создаем карточки
             selectedOptions.forEach(option => {
                 let textContent = option.text;
-                
-                // Если есть дополнительный параметр (для сокровища)
                 if (option.extra) {
                     textContent += `: <span>${getRandomItem(option.extra)}</span>`;
                 }
@@ -761,11 +792,9 @@
                     <div class="result-title">${option.title}</div>
                     <div class="result-detail">${textContent}</div>
                 `;
-                
                 transitionResults.appendChild(card);
             });
         }
-
         transitionBtn.addEventListener('click', generateTransitions);
     </script>
 </body>
