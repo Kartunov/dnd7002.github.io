@@ -6,50 +6,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Доска с заданиями — D&D</title>
     <style>
+        /* Подключаем шрифт для заголовков */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
+
         body {
             font-family: Georgia, serif;
+            /* Фон с текстурой */
             background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #e8e0d0;
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
+            box-sizing: border-box;
         }
+
         h1 {
+            font-family: 'Cinzel', serif;
             color: #c9a227;
             border-bottom: 2px solid #c9a227;
             padding-bottom: 10px;
             text-align: center;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-top: 0;
         }
-        a { color: #e8b84b; }
 
-        .controls {
-            background-color: #2a2a2a;
-            padding: 20px;
-            border-radius: 8px;
+        a {
+            color: #e8b84b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover { color: #fff; }
+
+        .header-nav {
+            text-align: center;
             margin-bottom: 30px;
-            border-left: 4px solid #c9a227;
+            font-style: italic;
+        }
+
+        /* Блок управления */
+        .controls {
+            background-color: rgba(42, 42, 42, 0.95);
+            padding: 25px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            border: 1px solid #444;
+            border-left: 5px solid #c9a227;
             display: flex;
             gap: 15px;
             align-items: center;
             justify-content: center;
             flex-wrap: wrap;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         }
         .controls label {
             font-size: 1.1em;
             color: #c9a227;
+            font-family: 'Cinzel', serif;
         }
+        
         select {
             background-color: #1a1a1a;
-            color: #e8e0d0;
-            border: 1px solid #444;
-            padding: 10px;
+            color: #e8b84b;
+            border: 1px solid #555;
+            padding: 10px 15px;
             border-radius: 4px;
             font-family: inherit;
             font-size: 1.1em;
             cursor: pointer;
+            transition: border-color 0.2s;
         }
-        select:focus { outline: none; border-color: #c9a227; }
+        select:focus { 
+            outline: none; 
+            border-color: #c9a227; 
+        }
 
         /* Таблица */
         .table-container {
@@ -63,27 +95,41 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #1a1a1a;
+            background-color: rgba(42, 42, 42, 0.95);
             font-size: 1em;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            border-radius: 6px;
+            overflow: hidden; /* Чтобы скруглить углы таблицы */
         }
         th, td {
-            border: 1px solid #555;
-            padding: 15px;
+            border: 1px solid #444;
+            padding: 15px 20px;
             text-align: left;
             vertical-align: top;
         }
         th {
             background-color: #333;
             color: #c9a227;
+            font-family: 'Cinzel', serif;
             font-weight: normal;
             text-align: center;
             text-transform: uppercase;
             font-size: 0.9em;
             letter-spacing: 1px;
+            border-bottom: 2px solid #c9a227;
         }
         td {
             font-size: 1.05em;
         }
+        
+        /* Чередование цветов строк для читаемости */
+        tbody tr:nth-child(even) {
+            background-color: rgba(26, 26, 26, 0.5);
+        }
+        tbody tr:hover {
+            background-color: rgba(51, 51, 51, 0.8);
+        }
+
         /* Подсветка пустых полей "Ничего" */
         .empty-text {
             color: #666;
@@ -91,6 +137,7 @@
         }
         .highlight {
             color: #e8b84b;
+            font-weight: bold;
         }
 
         @keyframes fadeIn {
@@ -101,17 +148,19 @@
 </head>
 <body>
     <h1>📜 Доска с заданиями</h1>
-    <p style="text-align: center;"><a href="index.html">← Назад на главную</a></p>
+    <div class="header-nav">
+        <a href="index.html">← Назад на главную</a>
+    </div>
 
     <div class="controls">
         <label for="quest-count">Сколько заданий должно висеть на доске?</label>
         <select id="quest-count">
             <option value="0">— Выберите —</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            <option value="1">1 задание</option>
+            <option value="2">2 задания</option>
+            <option value="3">3 задания</option>
+            <option value="4">4 задания</option>
+            <option value="5">5 заданий</option>
         </select>
     </div>
 
@@ -134,33 +183,30 @@
     <script>
         // ==== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====
         
-        // Функция для выбора случайного элемента из массива
         function getRandom(arr) {
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        // Функция для генерации "Особой награды" по заданным процентам
         function generateReward() {
-            const roll = Math.random() * 100; // от 0 до 100
+            const roll = Math.random() * 100; 
             
             if (roll < 60) {
                 return { text: "Ничего", isEmpty: true };
-            } else if (roll < 75) { // 60 + 15
+            } else if (roll < 75) {
                 const item = getRandom(["зелья", "свитки", "бомбы", "масла"]);
                 return { text: `Расходник (${item})`, isEmpty: false };
-            } else if (roll < 90) { // 75 + 15
+            } else if (roll < 90) {
                 const item = getRandom(["Оружие ближнего боя", "оружие дальнего боя", "доспехи"]);
                 return { text: `Снаряжение (${item})`, isEmpty: false };
-            } else if (roll < 95) { // 90 + 5
+            } else if (roll < 95) {
                 const item = getRandom(["возможность", "информация", "услуга"]);
                 return { text: `Анлок (${item})`, isEmpty: false };
-            } else { // 95 + 5 = 100
+            } else {
                 const item = getRandom(["артефакт", "безделушка"]);
                 return { text: `Особое (${item})`, isEmpty: false };
             }
         }
 
-        // Функция для генерации "Неожиданного поворота" по заданным процентам
         function generateTwist() {
             const roll = Math.random() * 100;
             
@@ -180,42 +226,23 @@
         // ==== ГЕНЕРАЦИЯ СТРОКИ ====
         
         function generateQuestRow() {
-            // 1. Задача
             const task = getRandom(["Убийство", "Сопровождение", "Доставка", "Сбор", "Спасение", "Расследование"]);
             
-            // 2. Уточнение (зависит от задачи)
             let detail = "";
             switch (task) {
-                case "Убийство":
-                    detail = getRandom(["НПС", "монстра"]);
-                    break;
-                case "Сопровождение":
-                    detail = getRandom(["НПС", "отряда"]);
-                    break;
-                case "Доставка":
-                    detail = getRandom(["вещь", "контрабанда"]);
-                    break;
-                case "Спасение":
-                    detail = getRandom(["НПС", "локации"]);
-                    break;
-                case "Сбор":
-                    detail = "ресурсов"; // Тут только один вариант
-                    break;
-                case "Расследование":
-                    detail = getRandom(["информации", "местности"]);
-                    break;
+                case "Убийство": detail = getRandom(["НПС", "монстра"]); break;
+                case "Сопровождение": detail = getRandom(["НПС", "отряда"]); break;
+                case "Доставка": detail = getRandom(["вещь", "контрабанда"]); break;
+                case "Спасение": detail = getRandom(["НПС", "локации"]); break;
+                case "Сбор": detail = "ресурсов"; break;
+                case "Расследование": detail = getRandom(["информации", "местности"]); break;
             }
 
-            // 3. Особая награда
             const reward = generateReward();
-
-            // 4. Неожиданный поворот
             const twist = generateTwist();
 
-            // 5. Создаем HTML для строки
             const tr = document.createElement('tr');
             
-            // Форматируем ячейки с учетом "пустоты"
             const taskClass = task ? 'highlight' : '';
             const rewardClass = reward.isEmpty ? 'empty-text' : 'highlight';
             const twistClass = twist.isEmpty ? 'empty-text' : 'highlight';
@@ -239,19 +266,14 @@
         selectElement.addEventListener('change', (e) => {
             const count = parseInt(e.target.value);
             
-            // Очищаем старые строки
             tableBody.innerHTML = '';
 
             if (count > 0) {
-                // Показываем таблицу
                 tableContainer.classList.add('active');
-                
-                // Генерируем нужное количество строк
                 for (let i = 0; i < count; i++) {
                     tableBody.appendChild(generateQuestRow());
                 }
             } else {
-                // Скрываем таблицу, если выбрано "Выберите"
                 tableContainer.classList.remove('active');
             }
         });
