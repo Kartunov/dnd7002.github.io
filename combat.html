@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Боевой трекер — D&D</title>
+    <link rel="icon" type="image/png" href="favicon.png"> <!-- Твоя иконка -->
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background-color: #1a1a1a;
+            color: #e8e0d0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        h1, h2 { color: #c9a227; border-bottom: 2px solid #c9a227; padding-bottom: 10px; text-align: center; }
+        a { color: #e8b84b; }
+        
+        .controls {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #c9a227;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        input[type="text"], input[type="number"] {
+            background-color: #1a1a1a;
+            color: #e8e0d0;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+        .btn {
+            background-color: #c9a227;
+            color: #1a1a1a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn:hover { background-color: #e8b84b; }
+        .btn-small { padding: 5px 10px; font-size: 0.9em; }
+        .btn-danger { background-color: #a83232; color: white; }
+        .btn-danger:hover { background-color: #d64545; }
+        .btn-green { background-color: #2e7d32; color: white; }
+        .btn-green:hover { background-color: #43a047; }
+
+        /* Таблица трекера */
+        .tracker-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1a1a1a;
+        }
+        .tracker-table th, .tracker-table td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .tracker-table th {
+            background-color: #333;
+            color: #c9a227;
+            text-align: center;
+        }
+        
+        /* Стили для ХП */
+        .hp-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #444;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .hp-fill {
+            height: 100%;
+            background-color: #a83232;
+            transition: width 0.3s ease;
+        }
+
+        /* Блок состояний */
+        .conditions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .condition-item {
+            background-color: #2a2a2a;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            border-left: 2px solid #c9a227;
+        }
+        
+        .add-cond-form {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .add-cond-form input {
+            flex-grow: 1;
+            padding: 5px;
+            font-size: 0.9em;
+        }
+        
+        .concentration-badge {
+            display: inline-block;
+            background-color: #c9a227;
+            color: #1a1a1a;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚔️ Боевой трекер</h1>
+    <p style="text-align: center;"><a href="index.html">← Назад на главную</a></p>
+
+    <!-- Форма добавления -->
+    <div class="controls">
+        <input type="text" id="char-name" placeholder="Имя (игрок или монстр)" style="flex-grow: 2;">
+        <input type="number" id="char-init" placeholder="Инициатива" style="width: 120px;">
+        <input type="number" id="char-hp" placeholder="ХП" style="width: 80px;">
+        <input type="number" id="char-ac" placeholder="КД" style="width: 80px;">
+        <button class="btn" id="add-btn">Добавить в бой</button>
+        <button class="btn btn-danger" id="clear-btn" style="margin-left: auto;">Очистить всё</button>
+    </div>
+
+    <table class="tracker-table">
+        <thead>
+            <tr>
+                <th style="width: 50px;">Иниц.</th>
+                <th style="width: 200px;">Имя</th>
+                <th>ХП / КД</th>
+                <th>Состояния</th>
+                <th style="width: 100px;">Концентрация</th>
+                <th style="width: 50px;">Удалить</th>
+            </tr>
+        </thead>
+        <tbody id="tracker-body">
+            <!-- Сюда добавляются участники -->
+        </tbody>
+    </table>
+
+    <script>
+        // Массив для хранения участников
+        let combatants = [];
+
+        const trackerBody = document.getElementById('tracker-body');
+
+        // Функция сортировки по инициативе (по убыванию)
+        function sortCombatants() {
+            combatants.sort((a, b) => b.init - a.init);
+        }
+
+        // Функция для отрисовки таблицы
+        function render() {
+            trackerBody.innerHTML = '';
+            sortCombatants();
+
+            combatants.forEach((c, index) => {
+                const tr = document.createElement('tr');
+                
+                // Генерируем HTML для состояний
+                let conditionsHtml = '';
+                if (c.conditions.length > 0) {
+                    conditionsHtml = `<div class="conditions-list">
+                        ${c.conditions.map((cond, i) => `
+                            <div class="condition-item">
+                                <span>${cond.name} (${cond.duration})</span>
+                                <button class="btn btn-small" onclick="reduceCondition('${c.id}', ${i})">-1</button>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+
+                // Полоса здоровья
+                const hpPercent = Math.max(0, Math.min(100, (c.hp / c.maxHp) * 100));
+
+                tr.innerHTML = `
+                    <td style="text-align: center; font-size: 1.2em; color: #e8b84b;">${c.init}</td>
+                    <td><b>${c.name}</b></td>
+                    <td>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <input type="number" value="${c.hp}" onchange="updateHP('${c.id}', this.value)" style="width: 60px;"> 
+                            / ${c.maxHp} ХП
+                        </div>
+                        <div class="hp-bar"><div class="hp-fill" style="width: ${hpPercent}%"></div></div>
+                        <div style="margin-top: 5px; font-size: 0.9em;">КД: <b>${c.ac}</b></div>
+                        <div style="margin-top: 5px; display: flex; gap: 5px;">
+                            <button class="btn btn-small btn-danger" onclick="changeHP('${c.id}', -5)">-5</button>
+                            <button class="btn btn-small btn-danger" onclick="changeHP('${c.id}', -1)">-1</button>
+                            <button class="btn btn-small btn-green" onclick="changeHP('${c.id}', 1)">+1</button>
+                            <button class="btn btn-small btn-green" onclick="changeHP('${c.id}', 5)">+5</button>
+                        </div>
+                    </td>
+                    <td>
+                        ${conditionsHtml}
+                        <div class="add-cond-form">
+                            <input type="text" id="cond-name-${c.id}" placeholder="Эффект">
+                            <input type="number" id="cond-dur-${c.id}" placeholder="Раунды" style="width: 70px;" value="1">
+                            <button class="btn btn-small" onclick="addCondition('${c.id}')">+</button>
+                        </div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" ${c.concentration ? 'checked' : ''} onchange="toggleConcentration('${c.id}', this.checked)" style="transform: scale(1.5); cursor: pointer;">
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-small btn-danger" onclick="removeCombatant('${c.id}')">✖</button>
+                    </td>
+                `;
+                trackerBody.appendChild(tr);
+            });
+        }
+
+        // ==== ФУНКЦИИ ВЗАИМОДЕЙСТВИЯ ====
+
+        // Добавление участника
+        document.getElementById('add-btn').onclick = () => {
+            const name = document.getElementById('char-name').value.trim();
+            const init = parseInt(document.getElementById('char-init').value) || 0;
+            const hp = parseInt(document.getElementById('char-hp').value) || 10;
+            const ac = parseInt(document.getElementById('char-ac').value) || 10;
+
+            if (!name) {
+                alert("Введите имя!");
+                return;
+            }
+
+            combatants.push({
+                id: Date.now().toString(), // Уникальный ID
+                name: name,
+                init: init,
+                hp: hp,
+                maxHp: hp,
+                ac: ac,
+                conditions: [],
+                concentration: false
+            });
+
+            // Очищаем поля ввода
+            document.getElementById('char-name').value = '';
+            document.getElementById('char-init').value = '';
+            document.getElementById('char-hp').value = '';
+            document.getElementById('char-ac').value = '';
+
+            render();
+        };
+
+        // Удаление участника
+        function removeCombatant(id) {
+            if (confirm("Удалить этого участника из боя?")) {
+                combatants = combatants.filter(c => c.id !== id);
+                render();
+            }
+        }
+
+        // Изменение ХП на определенное значение
+        function changeHP(id, amount) {
+            const c = combatants.find(c => c.id === id);
+            if (c) {
+                c.hp += amount;
+                if (c.hp > c.maxHp) c.hp = c.maxHp; // Ограничение сверху
+                render();
+            }
+        }
+
+        // Ручное обновление ХП через input
+        function updateHP(id, val) {
+            const c = combatants.find(c => c.id === id);
+            if (c) {
+                c.hp = parseInt(val) || 0;
+                render();
+            }
+        }
+
+        // Добавление состояния
+        function addCondition(id) {
+            const nameInput = document.getElementById(`cond-name-${id}`);
+            const durInput = document.getElementById(`cond-dur-${id}`);
+            
+            const name = nameInput.value.trim();
+            const duration = parseInt(durInput.value) || 1;
+
+            if (!name) {
+                alert("Введите название эффекта!");
+                return;
+            }
+
+            const c = combatants.find(c => c.id === id);
+            if (c) {
+                c.conditions.push({ name: name, duration: duration });
+                nameInput.value = ''; // Очищаем поле
+                render();
+            }
+        }
+
+        // Уменьшение длительности состояния на 1
+        function reduceCondition(charId, condIndex) {
+            const c = combatants.find(c => c.id === charId);
+            if (c && c.conditions[condIndex]) {
+                c.conditions[condIndex].duration -= 1;
+                // Если длительность упала до 0, удаляем эффект
+                if (c.conditions[condIndex].duration <= 0) {
+                    c.conditions.splice(condIndex, 1);
+                }
+                render();
+            }
+        }
+
+        // Переключение концентрации
+        function toggleConcentration(id, isChecked) {
+            const c = combatants.find(c => c.id === id);
+            if (c) {
+                c.concentration = isChecked;
+                render();
+            }
+        }
+
+        // Очистить бой
+        document.getElementById('clear-btn').onclick = () => {
+            if (confirm("Вы уверены, что хотите полностью очистить трекер? Все данные будут удалены.")) {
+                combatants = [];
+                render();
+            }
+        };
+
+        // Первичная отрисовка
+        render();
+    </script>
+</body>
+</html>
