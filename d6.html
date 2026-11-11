@@ -131,6 +131,36 @@
             box-shadow: inset 0 0 5px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
         }
 
+        /* Легенда */
+        .legend {
+            display: none;
+            margin-top: 20px;
+            width: 100%;
+            background-color: rgba(15, 23, 34, 0.6);
+            border: 1px solid #2c5a8c;
+            border-radius: 6px;
+            padding: 15px;
+            box-sizing: border-box;
+            font-size: 0.95em;
+        }
+        .legend.active {
+            display: block;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        .legend-icon {
+            font-size: 1.4em;
+            width: 30px;
+            text-align: center;
+        }
+
         /* Подсказки */
         .info-text {
             margin-top: 15px;
@@ -151,6 +181,14 @@
         <!-- Сетка -->
         <div class="grid-container" id="grid"></div>
         
+        <!-- Легенда -->
+        <div class="legend" id="legend">
+            <div class="legend-item"><span class="legend-icon">🚩</span> <span>Старт</span></div>
+            <div class="legend-item"><span class="legend-icon">💀</span> <span>Босс (финиш)</span></div>
+            <div class="legend-item"><span class="legend-icon">⚠️</span> <span>Ловушки и награда</span></div>
+            <div class="legend-item"><span class="legend-icon">🧩</span> <span>Головоломка и награда</span></div>
+        </div>
+
         <div class="info-text" id="info"></div>
     </div>
 
@@ -161,6 +199,7 @@
         const gridContainer = document.getElementById('grid');
         const generateBtn = document.getElementById('generate-btn');
         const infoText = document.getElementById('info');
+        const legend = document.getElementById('legend');
 
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -186,12 +225,12 @@
             gridContainer.innerHTML = '';
             const roomsSet = new Set();
             
-            // 1. Стартовая комната всегда в центре
+            // 1. Старт в центре
             const startX = Math.floor(GRID_SIZE / 2);
             const startY = Math.floor(GRID_SIZE / 2);
             roomsSet.add(`${startX},${startY}`);
             
-            // 2. Создаем базу (3 соединенные комнаты)
+            // 2. База (3 соединенные комнаты)
             let added = 1;
             while (added < 3) {
                 const roomsArray = Array.from(roomsSet);
@@ -209,7 +248,7 @@
                 }
             }
 
-            // 3. Добавляем случайные комнаты
+            // 3. Случайные дополнительные комнаты
             const extraRooms = getRandomInt(1, 6);
             let attempts = 0;
             let extraAdded = 0;
@@ -231,8 +270,7 @@
                 }
             }
 
-            // 4. ПОИСК САМОЙ ДАЛЕКОЙ КОМНАТЫ (Алгоритм BFS)
-            // Создаем очередь для обхода
+            // 4. Поиск самой далекой комнаты (BFS)
             const queue = [{ x: startX, y: startY, dist: 0 }];
             const visited = new Set();
             visited.add(`${startX},${startY}`);
@@ -242,21 +280,17 @@
 
             while (queue.length > 0) {
                 const current = queue.shift();
-                
-                // Если нашли комнату дальше, запоминаем её
                 if (current.dist > maxDistance) {
                     maxDistance = current.dist;
                     farthestRoom = { x: current.x, y: current.y };
                 }
 
-                // Проверяем соседей
                 const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
                 for (let [dx, dy] of dirs) {
                     const nx = current.x + dx;
                     const ny = current.y + dy;
                     const key = `${nx},${ny}`;
                     
-                    // Если сосед - это комната, мы там еще не были
                     if (roomsSet.has(key) && !visited.has(key)) {
                         visited.add(key);
                         queue.push({ x: nx, y: ny, dist: current.dist + 1 });
@@ -264,7 +298,28 @@
                 }
             }
 
-            // 5. Отрисовка сетки
+            // 5. Выбор случайной комнаты для события
+            // Собираем все комнаты, кроме старта и босса
+            const availableRooms = [];
+            roomsSet.forEach(key => {
+                const [x, y] = key.split(',').map(Number);
+                const isStart = (x === startX && y === startY);
+                const isBoss = (x === farthestRoom.x && y === farthestRoom.y);
+                if (!isStart && !isBoss) {
+                    availableRooms.push({ x, y });
+                }
+            });
+
+            // Если есть свободные комнаты, выбираем одну
+            let eventRoom = null;
+            let eventIcon = '';
+            if (availableRooms.length > 0) {
+                eventRoom = availableRooms[getRandomInt(0, availableRooms.length - 1)];
+                // 50/50 шанс на ловушку или головоломку
+                eventIcon = Math.random() < 0.5 ? '⚠️' : '🧩';
+            }
+
+            // 6. Отрисовка
             for (let y = 0; y < GRID_SIZE; y++) {
                 for (let x = 0; x < GRID_SIZE; x++) {
                     const cell = document.createElement('div');
@@ -273,13 +328,14 @@
                     if (roomsSet.has(`${x},${y}`)) {
                         cell.classList.add('room');
                         
-                        // Ставим старт в центре
                         if (x === startX && y === startY) {
                             cell.textContent = '🚩';
                         }
-                        // Ставим финиш в самой дальней точке
                         else if (x === farthestRoom.x && y === farthestRoom.y) {
-                            cell.textContent = '🏁';
+                            cell.textContent = '💀'; // Заменили финиш на череп
+                        }
+                        else if (eventRoom && x === eventRoom.x && y === eventRoom.y) {
+                            cell.textContent = eventIcon;
                         }
                     }
                     
@@ -288,7 +344,8 @@
             }
 
             gridContainer.classList.add('active');
-            infoText.textContent = `Этаж готов! Комнат: ${roomsSet.size}. Финиш на расстоянии ${maxDistance} шагов от старта.`;
+            legend.classList.add('active');
+            infoText.textContent = `Этаж готов! Комнат: ${roomsSet.size}. До босса ${maxDistance} шагов.`;
         }
 
         generateBtn.addEventListener('click', generateDungeon);
