@@ -434,92 +434,10 @@
         <div class="table-container">
         <h2>Результат (Статблок)</h2>
         
-        <!-- Кнопки управления -->
-        <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-            <button class="btn" id="download-word-btn">Скачать в Word (.doc)</button>
-            <button class="btn" id="save-to-db-btn" style="background-color: #4CAF50; color: white;">💾 Сохранить в базу</button>
-        </div>
+        <!-- НОВАЯ КНОПКА ДЛЯ СКАЧИВАНИЯ -->
+        <button class="btn" id="download-word-btn" style="margin-bottom: 20px;">Скачать в Word (.doc)</button>
 
         <table>
-
-            <script>
-                        // ==========================================
-        // СОХРАНЕНИЕ В ЛОКАЛЬНУЮ БАЗУ
-        // ==========================================
-        
-        document.getElementById('save-to-db-btn').addEventListener('click', function() {
-            const monsterName = document.getElementById('name').value.trim();
-            
-            if (!monsterName) {
-                alert("Пожалуйста, введите имя монстра перед сохранением!");
-                return;
-            }
-
-            // Собираем все данные из формы
-            const monsterData = {
-                id: Date.now().toString(), // Уникальный ID на основе времени
-                name: monsterName,
-                type: document.getElementById('type').value,
-                size: document.getElementById('size').value,
-                role: document.getElementById('role').value,
-                ac: document.getElementById('ac').value,
-                hpMin: document.getElementById('hp-min').value,
-                hpMax: document.getElementById('hp-max').value,
-                speed: document.getElementById('speed').value,
-                stats: {
-                    str: document.querySelector('[data-stat="str"]').value,
-                    dex: document.querySelector('[data-stat="dex"]').value,
-                    con: document.querySelector('[data-stat="con"]').value,
-                    int: document.querySelector('[data-stat="int"]').value,
-                    wis: document.querySelector('[data-stat="wis"]').value,
-                    cha: document.querySelector('[data-stat="cha"]').value
-                },
-                saves: Array.from(document.querySelectorAll('.save-select')).map(s => s.value).filter(v => v !== ""),
-                vulns: Array.from(document.querySelectorAll('.vuln-select')).map(s => s.value).filter(v => v !== ""),
-                ress: Array.from(document.querySelectorAll('.res-select')).map(s => s.value).filter(v => v !== ""),
-                imms: Array.from(document.querySelectorAll('.imm-select')).map(s => s.value).filter(v => v !== ""),
-                traits: document.getElementById('traits').value,
-                actions: document.getElementById('actions').value,
-                bonusActions: document.getElementById('bonus-actions').value,
-                reactions: document.getElementById('reactions').value,
-                legendaryActions: document.getElementById('legendary-actions').value,
-                description: document.getElementById('description').value
-            };
-
-            // Получаем текущую базу из localStorage или создаем пустую
-            let db = JSON.parse(localStorage.getItem('dnd_monsters_db')) || { folders: [] };
-            
-            // Спрашиваем у пользователя, в какую папку сохранить
-            // Если папок нет, создаем папку "Без папки"
-            let folderNames = db.folders.map(f => f.name);
-            if (folderNames.length === 0) {
-                folderNames.push("Без папки");
-                db.folders.push({ name: "Без папки", monsters: [] });
-            }
-
-            const folderChoice = prompt("Введите название папки для сохранения (или оставьте пустым для 'Без папки'):\nДоступные папки: " + folderNames.join(", "));
-            
-            let targetFolderName = folderChoice ? folderChoice.trim() : "Без папки";
-            if (!targetFolderName) targetFolderName = "Без папки";
-
-            // Ищем папку
-            let folder = db.folders.find(f => f.name.toLowerCase() === targetFolderName.toLowerCase());
-            
-            // Если папки нет — создаем новую
-            if (!folder) {
-                folder = { name: targetFolderName, monsters: [] };
-                db.folders.push(folder);
-            }
-
-            // Добавляем монстра в папку
-            folder.monsters.push(monsterData);
-
-            // Сохраняем обратно в localStorage
-            localStorage.setItem('dnd_monsters_db', JSON.stringify(db));
-
-            alert(`Монстр "${monsterName}" успешно сохранен в папку "${folder.name}"!`);
-        });
-            </script>
 
             <script>
                         // ==========================================
@@ -581,7 +499,5 @@
             document.body.removeChild(downloadLink);
         });
             </script>
-
-            
 </body>
 </html>
