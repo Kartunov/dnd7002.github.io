@@ -13,7 +13,7 @@
             background-color: #0f1722; 
             background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #c9d6e8;
-            max-width: 900px;
+            max-width: 1300px; /* Увеличили ширину, чтобы влезло 5 карточек */
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
@@ -22,11 +22,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .content-container {
-            width: 100%;
-            max-width: 800px;
         }
 
         h1 {
@@ -41,21 +36,42 @@
             margin-bottom: 40px;
         }
 
+        /* Сетка для карточек */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 колонок */
+            gap: 20px;
+            width: 100%;
+            align-items: stretch; /* Карточки одинаковой высоты */
+        }
+
+        /* Адаптивность для небольших экранов */
+        @media (max-width: 1100px) {
+            .cards-container { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 800px) {
+            .cards-container { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .cards-container { grid-template-columns: 1fr; }
+        }
+
+        /* Общие стили для карточек */
         .card {
             display: flex;
             flex-direction: column;
-            padding: 25px 30px;
+            padding: 25px 20px;
             border-radius: 6px;
-            margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.5);
             transition: all 0.3s ease;
             box-sizing: border-box;
+            height: 100%; /* Растягиваем на всю высоту */
         }
 
         .card h2 {
             margin-top: 0;
             font-family: 'Cinzel', serif;
-            font-size: 1.5em;
+            font-size: 1.3em; /* Чуть уменьшили шрифт для компактности */
             border-bottom: 1px solid #444;
             padding-bottom: 10px;
             margin-bottom: 15px;
@@ -63,9 +79,11 @@
 
         .card p {
             margin-bottom: 0;
-            font-size: 1.05em;
+            font-size: 0.95em;
+            flex-grow: 1; /* Прижимаем текст к верху */
         }
 
+        /* Желтая карточка (кликабельная) */
         .card-yellow {
             background-color: rgba(42, 42, 42, 0.95);
             border: 1px solid #444;
@@ -77,8 +95,8 @@
 
         .card-yellow:hover {
             background-color: rgba(51, 51, 51, 1);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(201, 162, 39, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(201, 162, 39, 0.2);
             border-color: #c9a227;
         }
 
@@ -86,6 +104,7 @@
             color: #c9a227;
         }
 
+        /* Синяя карточка (кликабельная) */
         .card-blue-clickable {
             background-color: rgba(27, 40, 56, 0.95);
             border: 1px solid #333;
@@ -97,8 +116,8 @@
 
         .card-blue-clickable:hover {
             background-color: rgba(35, 51, 71, 1);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(74, 144, 226, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
             border-color: #4a90e2;
         }
 
@@ -108,13 +127,10 @@
     </style>
 </head>
 <body>
-    <div class="content-container">
-        <h1>💙 Инструменты Кадгара</h1>
+    <h1>💙 Инструменты Кадгара</h1>
 
-        <a href="index.html" class="card card-yellow">
-            <h2>Инструменты мастера</h2>
-            <p>Иди на свет, твоей цели нет в этом подземелье, тебя ждут настоящие приключения</p>
-        </a>
+    <!-- Контейнер для сетки карточек -->
+    <div class="cards-container">
         
         <a href="d6.html" class="card card-blue-clickable">
             <h2>Первый уровень</h2>
@@ -135,7 +151,12 @@
             <h2>Четвертый уровень</h2>
             <p>От 1 до 12 дополнительных комнат</p>
         </a>
+
+        <a href="index.html" class="card card-yellow">
+            <h2>Инструменты мастера</h2>
+            <p>Иди на свет, твоей цели нет в этом подземелье, тебя ждут настоящие приключения</p>
+        </a>
+        
     </div>
-    
 </body>
 </html>
