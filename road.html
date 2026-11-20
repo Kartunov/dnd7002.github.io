@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Артефакты и расходники — в разработке</title>
+    <title>Артефакты и расходники — D&D</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
 
@@ -13,15 +13,11 @@
             background-color: #1a1a1a;
             background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: #e8e0d0;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
             box-sizing: border-box;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         h1 {
@@ -46,21 +42,129 @@
             text-align: center;
             margin-bottom: 30px;
             font-style: italic;
-            font-size: 1.1em;
         }
 
-        .placeholder {
+        /* Стили для формы (верхняя таблица) */
+        .form-container {
             background-color: rgba(42, 42, 42, 0.95);
             border: 1px solid #444;
             border-left: 5px solid #c9a227;
             padding: 25px;
-            margin: 20px 0;
+            margin-bottom: 30px;
             border-radius: 6px;
-            color: #a89f8c;
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box;
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        .form-table td {
+            border: 1px solid #555;
+            padding: 10px;
+            vertical-align: top;
+        }
+        
+        .form-table label {
+            display: block;
+            color: #c9a227;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            font-family: 'Cinzel', serif;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            background-color: #1a1a1a;
+            color: #e8e0d0;
+            border: 1px solid #444;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background-color: #c9a227;
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+        .btn:hover { background-color: #e8b84b; }
+        .btn:active { transform: scale(0.98); }
+
+        /* Стили для итогового результата (нижняя таблица) */
+        .result-container {
+            background-color: rgba(42, 42, 42, 0.95);
+            border: 1px solid #444;
+            border-left: 5px solid #c9a227;
+            padding: 25px;
+            margin-top: 30px;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            display: none; /* Скрыто, пока нет данных */
+        }
+        
+        .result-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .result-table td {
+            border: 1px solid #555;
+            padding: 12px;
+            vertical-align: top;
+        }
+        
+        .result-table .header-cell {
+            background-color: #2a2a2a;
+            color: #c9a227;
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        .result-table .empty-cell {
+            color: #666;
+            font-style: italic;
+        }
+
+        .description-text {
+            white-space: pre-wrap; /* Сохраняем переносы строк */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -70,8 +174,202 @@
         <a href="index.html">← Назад на главную</a>
     </div>
 
-    <div class="placeholder">
-        <p>Страница в разработке. Здесь скоро появятся генераторы артефактов и расходников.</p>
+    <!-- Блок создания -->
+    <div class="form-container">
+        <h2 style="margin-top: 0; color: #c9a227; font-family: 'Cinzel', serif; text-align: center;">Создать предмет</h2>
+        
+        <table class="form-table">
+            <tr>
+                <td colspan="2">
+                    <label>Название</label>
+                    <input type="text" id="item-name" placeholder="Введите название...">
+                </td>
+                <td colspan="2">
+                    <label>На что направлено</label>
+                    <select id="item-target">
+                        <option value="">— Выберите —</option>
+                        <option>Статы</option>
+                        <option>Здоровье</option>
+                        <option>Оверздоровье</option>
+                        <option>КД</option>
+                        <option>Скорость перемещения</option>
+                        <option>Урон оружием</option>
+                        <option>Стихийный урон</option>
+                        <option>Сопротивления</option>
+                        <option>Уязвимости</option>
+                        <option>Иммунитеты</option>
+                        <option>Состояния</option>
+                        <option>Механики преимущества и помехи</option>
+                        <option>Действия</option>
+                        <option>Бонусные действия</option>
+                        <option>Умения</option>
+                        <option>Ходы</option>
+                        <option>Препятствия</option>
+                        <option>Тайлы</option>
+                        <option>Свитки</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Время</label>
+                    <select id="item-time">
+                        <option value="">— Выберите —</option>
+                        <option>Мгновенное</option>
+                        <option>Заряжаемое</option>
+                        <option>Постоянное</option>
+                    </select>
+                </td>
+                <td>
+                    <label>Условие</label>
+                    <select id="item-condition">
+                        <option value="">— Выберите —</option>
+                        <option>Отсутствие</option>
+                        <option>Триггер</option>
+                    </select>
+                </td>
+                <td>
+                    <label>Ценник</label>
+                    <select id="item-price">
+                        <option value="">— Выберите —</option>
+                        <option>Отсутствие</option>
+                        <option>Дебаф</option>
+                        <option>Проклятие</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <label>Описание</label>
+                    <textarea id="item-desc" placeholder="Опишите свойства предмета..."></textarea>
+                </td>
+            </tr>
+        </table>
+        
+        <button class="btn" id="download-word-btn">Скачать в Word (.doc)</button>
     </div>
+
+    <!-- Блок результата -->
+    <div class="result-container" id="result-box">
+        <table class="result-table" id="final-table">
+            <tr>
+                <td colspan="2" class="header-cell" id="out-name">Название</td>
+                <td colspan="2" class="header-cell" id="out-target">На что направлено</td>
+            </tr>
+            <tr>
+                <td style="width: 33%; text-align: center;"><b>Время:</b><br><span id="out-time" class="empty-cell">—</span></td>
+                <td style="width: 33%; text-align: center;"><b>Условие:</b><br><span id="out-cond" class="empty-cell">—</span></td>
+                <td style="width: 33%; text-align: center;"><b>Ценник:</b><br><span id="out-price" class="empty-cell">—</span></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <b>Описание:</b><br>
+                    <span id="out-desc" class="description-text empty-cell">—</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        // Получаем элементы формы
+        const nameInput = document.getElementById('item-name');
+        const targetSelect = document.getElementById('item-target');
+        const timeSelect = document.getElementById('item-time');
+        const condSelect = document.getElementById('item-condition');
+        const priceSelect = document.getElementById('item-price');
+        const descInput = document.getElementById('item-desc');
+        
+        // Получаем элементы вывода
+        const resultBox = document.getElementById('result-box');
+        const outName = document.getElementById('out-name');
+        const outTarget = document.getElementById('out-target');
+        const outTime = document.getElementById('out-time');
+        const outCond = document.getElementById('out-cond');
+        const outPrice = document.getElementById('out-price');
+        const outDesc = document.getElementById('out-desc');
+
+        // Функция обновления таблицы
+        function updateTable() {
+            // Проверяем, есть ли хоть какие-то данные, чтобы показать/скрыть блок
+            const hasData = nameInput.value.trim() || targetSelect.value || timeSelect.value || condSelect.value || priceSelect.value || descInput.value.trim();
+            
+            if (hasData) {
+                resultBox.classList.add('active');
+            } else {
+                resultBox.classList.remove('active');
+            }
+
+            // Обновляем ячейки
+            outName.textContent = nameInput.value.trim() || "Название";
+            outName.style.color = nameInput.value.trim() ? "#e8b84b" : "#c9a227";
+
+            outTarget.textContent = targetSelect.value || "—";
+            outTarget.classList.toggle('empty-cell', !targetSelect.value);
+
+            outTime.textContent = timeSelect.value || "—";
+            outTime.classList.toggle('empty-cell', !timeSelect.value);
+
+            outCond.textContent = condSelect.value || "—";
+            outCond.classList.toggle('empty-cell', !condSelect.value);
+
+            outPrice.textContent = priceSelect.value || "—";
+            outPrice.classList.toggle('empty-cell', !priceSelect.value);
+
+            outDesc.textContent = descInput.value.trim() || "—";
+            outDesc.classList.toggle('empty-cell', !descInput.value.trim());
+        }
+
+        // Навешиваем слушатели на все поля
+        nameInput.addEventListener('input', updateTable);
+        targetSelect.addEventListener('change', updateTable);
+        timeSelect.addEventListener('change', updateTable);
+        condSelect.addEventListener('change', updateTable);
+        priceSelect.addEventListener('change', updateTable);
+        descInput.addEventListener('input', updateTable);
+
+        // Экспорт в Word
+        document.getElementById('download-word-btn').addEventListener('click', function() {
+            const table = document.getElementById('final-table');
+            const tableClone = table.cloneNode(true);
+            
+            const htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                      xmlns:w='urn:schemas-microsoft-com:office:word' 
+                      xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset="utf-8">
+                    <title>Предмет</title>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { 
+                            border: 1px solid #000000; 
+                            padding: 8px; 
+                            text-align: left; 
+                            vertical-align: top;
+                            font-size: 14px;
+                        }
+                        .header-cell { background-color: #f0f0f0; font-weight: bold; text-align: center; }
+                        .empty-cell { color: #888888; font-style: italic; }
+                    </style>
+                </head>
+                <body>
+                    ${tableClone.outerHTML}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+            
+            const itemName = nameInput.value.trim() || 'Новый_предмет';
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = `${itemName.replace(/\s+/g, '_')}.doc`;
+            
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        });
+    </script>
 </body>
 </html>
